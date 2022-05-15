@@ -1,6 +1,7 @@
 import java.util.Scanner;
 
 public class Bank {
+    Customer cus1 = new Customer(01,"Mr", "Jack", "McArdle", "Male");
 
     Scanner scan = new Scanner(System.in);
     public static void main(String args[]){
@@ -29,7 +30,10 @@ public class Bank {
     }
 
     private void menu(){
-        System.out.println("==================== Welcome to your Online Banking '''NAMEHERE'''''=========================\n" +
+        System.out.println("==================== Welcome to your Online Banking " + cus1.getPrefix() + " " + cus1.getSurname() +
+                " =========================\n" +
                 "Lists of accounts");
+        Account acc1 = new Account("123","pro",01,200);
+        System.out.println();
     }
 }

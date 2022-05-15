@@ -13,4 +13,24 @@ public class Customer {
         this.surname = surname;
         this.gender = gender;
     }
+
+    public int getCustID(){
+        return this.custID;
+    }
+
+    public String getPrefix(){
+        return this.prefix;
+    }
+
+    public String getForename(){
+        return this.forename;
+    }
+
+    public String getSurname(){
+        return this.surname;
+    }
+
+    public String getGender(){
+        return this.gender;
+    }
 }
