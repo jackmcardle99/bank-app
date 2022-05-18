@@ -1,6 +1,6 @@
-import javax.sql.DataSource;
 import java.util.Scanner;
 import java.sql.*;
+
 public class Bank {
     Customer cus1 = new Customer(01,"Mr", "Jack", "McArdle", "Male");
     Scanner scan = new Scanner(System.in);
@@ -8,12 +8,13 @@ public class Bank {
 
 
 
-    public static void main(String args[]){
+    public static void main(String args[]) throws SQLException {
+
         Bank app = new Bank();
-        app.logIn();
+        app.menu();
     }
 
-    private void logIn(){
+    private void menu() throws SQLException {
         while (true) {
             System.out.println("(1) Log in\n(2) Apply for Account\n(3) Exit");
             String input = scan.nextLine();
@@ -26,34 +27,53 @@ public class Bank {
             if (input.equals("3")) {
                 System.out.println("Goodbye!");
             } else {
-                this.menu();
+                this.logIn(dbConnect());
             }
             break;
         }
+    }
+    public Connection dbConnect(){
+       // Connection conn;
+        try{
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/bank_db","root","76647664");
+            return conn;
+        }
+        catch (Exception e ){
+            System.out.println(e);
+        }
+        return null;
+
+    }
+    private void logIn(Connection conn) throws SQLException {
+        Customer cust = new Customer();
+        cust.logIn(dbConnect());
+//        System.out.println("Please enter your username");
+//        String username = scan.nextLine();
+//        System.out.println("Please enter your password");
+//        String password = scan.nextLine();
+//
+//        String query = "SELECT * FROM CUSTOMERS;";
+//        Statement statement = conn.createStatement();
+//        ResultSet rs = statement.executeQuery(query);
+        //System.out.println(rs.toString());
+
     }
 
     private void createAccount(){
 
         try{
-          //Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection conn = DriverManager.getConnection("#DataSourceSettings#\n" +
-                    "#LocalDataSource: bank_db\n" +
-                    "#BEGIN#\n" +
-                    "<data-source source=\"LOCAL\" name=\"bank_db\" uuid=\"d8045415-4f31-47f6-afdd-bdc92689693d\"><database-info product=\"MySQL\" version=\"8.0.29\" jdbc-version=\"4.2\" driver-name=\"MySQL Connector/J\" driver-version=\"mysql-connector-java-8.0.25 (Revision: 08be9e9b4cba6aa115f9b27b215887af40b159e0)\" dbms=\"MYSQL\" exact-version=\"8.0.29\" exact-driver-version=\"8.0\"><extra-name-characters>#@</extra-name-characters><identifier-quote-string>`</identifier-quote-string></database-info><case-sensitivity plain-identifiers=\"mixed\" quoted-identifiers=\"mixed\"/><driver-ref>mysql.8</driver-ref><synchronize>true</synchronize><jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver><jdbc-url>jdbc:mysql://localhost:3306/bank_db</jdbc-url><secret-storage>master_key</secret-storage><user-name>root</user-name><schema-mapping><introspection-scope><node kind=\"schema\" qname=\"@\"/></introspection-scope></schema-mapping><working-dir>$ProjectFileDir$</working-dir></data-source>\n" +
-                    "#END#\n" +
-                    "\n");
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/bank_db","root","76647664");
         }
         catch (Exception e ){
             System.out.println(e);
         }
 
-        System.out.println("Please enter your username");
-        String username = scan.nextLine();
-        System.out.println("Please enter your password");
-        String password = scan.nextLine();
+
     }
 
-    private void menu(){
+    private void home(){
         System.out.println("==================== Welcome to your Online Banking " + cus1.getPrefix() + " " + cus1.getSurname() +
                 " =========================\n" +
                 "Lists of accounts");
