@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="bank-db.mwb" uuid="8ed64360-3e5c-457d-a758-45a0bdb843b8">
-      <driver-ref>derby.embedded</driver-ref>
+    <data-source source="LOCAL" name="bank_db" uuid="d8045415-4f31-47f6-afdd-bdc92689693d">
+      <driver-ref>mysql.8</driver-ref>
       <synchronize>true</synchronize>
-      <jdbc-driver>org.apache.derby.jdbc.EmbeddedDriver</jdbc-driver>
-      <jdbc-url>jdbc:derby:$PROJECT_DIR$/bank-db.mwb;create=true</jdbc-url>
+      <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
+      <jdbc-url>jdbc:mysql://localhost:3306/bank_db</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
   </component>
