@@ -22,29 +22,6 @@ public class Customer {
     public String toString(){
         return custID + " | " + prefix + "| " + forename + " | " + surname + " | " + gender + " | " + dob;
     }
-    /*public void logIn(Connection conn) throws SQLException {
-        try{
-            String query = "SELECT * FROM CUSTOMERS;";
-            Statement statement = conn.createStatement();
-            ResultSet rs = statement.executeQuery(query);
-            //System.out.println(rs.toString());
-            while (rs.next()){
-                custID = rs.getInt("custID");
-                prefix = rs.getString("prefix");
-                forename = rs.getString("forename");
-                surname = rs.getString("surname");
-                gender = rs.getString("gender");
-                dob = rs.getDate("dob");
-                Customer cust = new Customer(custID,prefix,forename,surname,gender,dob);
-                System.out.println(cust);
-            }
-
-        }
-        catch (Exception e ){
-            System.out.println(e);
-        }
-
-    }*/
 
     public boolean findUser(Connection conn,String user) throws SQLException {
         String passQuery = "select * from (SELECT username FROM credentials" + //sql query to search database for username passed
@@ -74,15 +51,24 @@ public class Customer {
                     return true;
                 }while (rs.next());
             }
+            else{
+                System.out.println("Password wrong, try again.");
+            }
         } catch (SQLException e) {
             System.out.println(e);;
         }
         return false;
     }
 
-    public Customer setCurrentUser(){
-        //this method will set the an object of this class, of the current user logged in
-        return null;
+    public int getUserID(Connection conn, String user) throws SQLException {
+        String setUserQuery = "SELECT custID FROM credentials WHERE username = " + "\"" + user + "\"";
+        Statement statement = conn.createStatement();
+        ResultSet rs = statement.executeQuery(setUserQuery);
+        while(rs.next()){
+            int userID = rs.getInt("custID");
+            return userID;
+        }
+        return 0;
     }
 
     public int getCustID(){

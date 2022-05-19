@@ -15,21 +15,22 @@ public class Bank {
     }
 
     private void menu() throws SQLException {
-        while (true) {
+        String input = "";
+        while (!input.equals("3")) {
             System.out.println("(1) Log in\n(2) Apply for Account\n(3) Exit");
-            String input = scan.nextLine();
+            input = scan.nextLine();
             if (!input.equals("1") && !input.equals("2") && !input.equals("3")) {
                 System.out.println("Please enter valid input, either 1 or 2.");
             }
+            if(input.equals("1")){
+                this.logIn(dbConnect());
+            }
             if (input.equals("2")){
-                this.createAccount();
+                this.applyForm();
             }
             if (input.equals("3")) {
                 System.out.println("Goodbye!");
-            } else {
-                this.logIn(dbConnect());
             }
-            break;
         }
     }
     public Connection dbConnect(){
@@ -47,27 +48,34 @@ public class Bank {
     private void logIn(Connection conn) throws SQLException {
         boolean userFound = false, passFound = false;
         String user = null;
-        while (userFound != true)
+        while (!userFound)
         {
             System.out.println("Please enter in your username.");
             user = scan.nextLine();
             userFound = customer.findUser(this.dbConnect(),user);
         }
-        while (passFound != true){
-            System.out.println("Please enter in the password for " + user);
-            String pass = scan.nextLine();
-            passFound = customer.findPass(this.dbConnect(),pass,user);
-        }
-        if (userFound && passFound) { //if both are true
+            while (!passFound){
+                System.out.println("Please enter in the password for " + user);
+                String pass = scan.nextLine();
+                passFound = customer.findPass(this.dbConnect(),pass,user);
+            }
 
-        }
+        int userID = customer.getUserID(dbConnect(),user);
+        System.out.println(userID);
+
     }
 
-    private void createAccount(){
-        System.out.println("Please enter in your new username. Cannot be longer than 15 characters.");
-        String newUser = scan.nextLine();
-        System.out.println("Please enter in your new password. Cannot be longer than 15 characters.");
-        String newPass = scan.nextLine();
+    private void applyForm(){
+        String[]questions = {"Please enter in your title e.g. (Mr/Ms/Mrs","Please enter in your forename.", "Please enter in your surname.","Please enter in your gender e.g. (Male/Female)","Please Enter your date of birth. e.g. (YYYY-MM-DD)","Please enter in your new username. Cannot be longer than 15 characters.","Please enter in your new password. Cannot be longer than 15 characters."};
+        String[]answers;
+        //create for loop here which prints a question on each iteration, and adds answer to answer array
+        for (String lines : questions){
+            System.out.println(lines);
+        }
+
+    }
+
+    private void createProfile(){
 
     }
 
