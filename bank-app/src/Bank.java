@@ -2,9 +2,9 @@ import java.util.Scanner;
 import java.sql.*;
 
 public class Bank {
-    Customer cus1 = new Customer(01,"Mr", "Jack", "McArdle", "Male");
+    //Customer cus1 = new Customer(01,"Mr", "Jack", "McArdle", "Male", "1999-06-23");
     Scanner scan = new Scanner(System.in);
-
+    Customer customer = new Customer();
 
 
 
@@ -33,7 +33,6 @@ public class Bank {
         }
     }
     public Connection dbConnect(){
-       // Connection conn;
         try{
             Class.forName("com.mysql.cj.jdbc.Driver");
             Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/bank_db","root","76647664");
@@ -46,37 +45,36 @@ public class Bank {
 
     }
     private void logIn(Connection conn) throws SQLException {
-        Customer cust = new Customer();
-        cust.logIn(dbConnect());
-//        System.out.println("Please enter your username");
-//        String username = scan.nextLine();
-//        System.out.println("Please enter your password");
-//        String password = scan.nextLine();
-//
-//        String query = "SELECT * FROM CUSTOMERS;";
-//        Statement statement = conn.createStatement();
-//        ResultSet rs = statement.executeQuery(query);
-        //System.out.println(rs.toString());
+        boolean userFound = false, passFound = false;
+        String user = null;
+        while (userFound != true)
+        {
+            System.out.println("Please enter in your username.");
+            user = scan.nextLine();
+            userFound = customer.findUser(this.dbConnect(),user);
+        }
+        while (passFound != true){
+            System.out.println("Please enter in the password for " + user);
+            String pass = scan.nextLine();
+            passFound = customer.findPass(this.dbConnect(),pass,user);
+        }
+        if (userFound && passFound) { //if both are true
 
+        }
     }
 
     private void createAccount(){
-
-        try{
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/bank_db","root","76647664");
-        }
-        catch (Exception e ){
-            System.out.println(e);
-        }
-
+        System.out.println("Please enter in your new username. Cannot be longer than 15 characters.");
+        String newUser = scan.nextLine();
+        System.out.println("Please enter in your new password. Cannot be longer than 15 characters.");
+        String newPass = scan.nextLine();
 
     }
 
     private void home(){
-        System.out.println("==================== Welcome to your Online Banking " + cus1.getPrefix() + " " + cus1.getSurname() +
-                " =========================\n" +
-                "Lists of accounts");
+//        System.out.println("==================== Welcome to your Online Banking " + cus1.getPrefix() + " " + cus1.getSurname() +
+//                " =========================\n" +
+//                "Lists of accounts");
         Account acc1 = new Account("123","pro",01,200);
         System.out.println();
     }

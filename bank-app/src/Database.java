@@ -1,6 +1,6 @@
 import java.io.File;
 
-public class FileIO {
+public class Database {
 
     File file;
 
