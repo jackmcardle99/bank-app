@@ -26,7 +26,8 @@ public class Bank {
                 break;
             }
             if (input.equals("2")){
-                customer.createCustomerProfile(this.dbConnect(),this.applyForm());
+                this.applyForm();
+                //customer.createCustomerProfile(this.dbConnect(),this.applyForm());
             }
             if (input.equals("3")) {
                 System.out.println("Goodbye!");
@@ -62,14 +63,26 @@ public class Bank {
     }
 
     private String[] applyForm(){
-        String[]questionsArr = {"Please enter in your title e.g. (Mr/Ms/Mrs","Please enter in your forename.", "Please enter in your surname.","Please enter in your gender e.g. (Male/Female)","Please Enter your date of birth. e.g. (YYYY-MM-DD)","Please enter in your new username. Cannot be longer than 15 characters.","Please enter in your new password. Cannot be longer than 15 characters."};
+        String[]questionsArr = {"Please enter in your title e.g. (Mr/Ms/Mrs)","Please enter in your " +
+                "forename.", "Please enter in your surname.","Please enter in your gender e.g. (Male/Female)" +
+                "","Please Enter your date of birth. e.g. (YYYY-MM-DD)","Please enter in your new username. Cannot be " +
+                "longer than 15 characters.","Please enter in your new password. Cannot be longer than 15 characters."};
         String[]answersArr = new String[questionsArr.length];
-
+        boolean dontProceed = true;
+        int count = 0;
         for (int i = 0; i < questionsArr.length; i++){
-            System.out.println(questionsArr[i]);
-            String answer = scan.nextLine();
-            answersArr[i] = answer;
-        }
+            while (true){
+                System.out.println(questionsArr[i]);
+                String answer = scan.nextLine();
+                answersArr[i] = answer;
+                //boolean test = customer.validateApplication(answersArr);
+                if (customer.validateApplication(answersArr[i],count)){
+                    break;
+                }
+            }
+            count ++;
+            }
+        //customer.validateApplication(answersArr);
         return answersArr;
     }
 

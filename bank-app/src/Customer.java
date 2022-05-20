@@ -1,7 +1,8 @@
-import jdk.swing.interop.SwingInterOpUtils;
-
 import java.lang.reflect.Array;
 import java.sql.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class Customer {
 
@@ -24,7 +25,56 @@ public class Customer {
         return custID + " | " + prefix + "| " + forename + " | " + surname + " | " + gender + " | " + dob;
     }
 
-    public void validateApplication(){};
+    public boolean isEmptyOrNull(String word){
+        boolean test = "".equals(word);  // true
+        boolean emptyOrNull = false;
+        if (word == null || word.equals(test) ){
+            emptyOrNull = true;
+        }
+        return emptyOrNull;
+    }
+
+    public boolean validateApplication(String answer, int count) {
+        //MAYBE SWITCH CASE WITH COUNT ++?
+        switch (count){
+            case 0:
+                if (!answer.equals("Mr") && !answer.equals("Ms") && !answer.equals("Mrs")){
+                    System.out.println("Incorrect format for prefix - please ensure (Mr/Ms/Mrs)");
+                    return false;
+                }
+                break;
+            case 1:
+                if (answer.length() > 15 || this.isAlpha(answer) == false || this.isEmptyOrNull(answer)){
+                    System.out.println("Incorrect format for forename - please ensure name contains no numerals and is" +
+                            " 15 or less characters.");
+                    return false;
+                }
+                break;
+            case 2:
+                if (answer.length() > 15 || this.isAlpha(answer) == false || this.isEmptyOrNull(answer)){
+                    System.out.println("Incorrect format for surname - please ensure name contains no numerals and is" +
+                            " 15 or less characters.");
+                    return false;
+                }
+                break;
+            case 3:
+                if (!answer.equals("Male") || !answer.equals("Female")){
+                    System.out.println("Incorrect format for gender - please ensure (Male/Female)");
+                    return false;
+                }
+                break;
+            case 4:
+//                SimpleDateFormat simpleDate = new SimpleDateFormat("yyyy-MM-dd");
+//                Date date = simpleDate.parse(answer);
+//                String strDate = date.toString();
+                //if ()
+        }
+        return true;
+    }
+
+    public boolean isAlpha(String word) {
+        return word.matches("[a-zA-Z]+");
+    }
     public int getNewID(Connection conn) throws SQLException {
         //This code below is getting the ID of the new customer, so we can add it to the credentials table
         PreparedStatement getMaxID = conn.prepareStatement("SELECT  MAX(custID) FROM customers");
