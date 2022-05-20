@@ -2,13 +2,13 @@ import java.util.Scanner;
 import java.sql.*;
 
 public class Bank {
-    private Scanner scan = new Scanner(System.in);
-    private Customer customer = new Customer(); //for calling customer class methods
+    private final Scanner scan = new Scanner(System.in);
+    private final Customer customer = new Customer(); //for calling customer class methods
     private Customer session; //assigned when logged in, this is for the currently logged in customer
 
 
 
-    public static void main(String args[]) throws SQLException {
+    public static void main(String[] args) throws SQLException {
         Bank app = new Bank();
         app.menu();
     }
@@ -22,7 +22,7 @@ public class Bank {
                 System.out.println("Please enter valid input, either 1 or 2.");
             }
             if(input.equals("1")){
-                this.logIn(dbConnect());
+                this.logIn();
                 break;
             }
             if (input.equals("2")){
@@ -36,16 +36,13 @@ public class Bank {
     public Connection dbConnect(){
         try{
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/bank_db","root","76647664");
-            return conn;
+            return DriverManager.getConnection("jdbc:mysql://localhost:3306/bank_db","root","76647664");
         }
         catch (Exception e ){
-            System.out.println(e);
+            throw new RuntimeException("Can't connect to database.",e);
         }
-        return null;
-
     }
-    private void logIn(Connection conn) throws SQLException {
+    private void logIn() throws SQLException {
         boolean userFound = false, passFound = false;
         String user = null;
         while (!userFound)
@@ -76,15 +73,10 @@ public class Bank {
         return answersArr;
     }
 
-    private void createProfile(){
-
-    }
-
     private void home(){
         System.out.println("==================== Welcome to your Online Banking " + session.getPrefix() + " " + session.getSurname() +
                 " =========================\n" +
                 "Lists of accounts");
-        Account acc1 = new Account("123","pro",01,200);
         System.out.println();
     }
 }

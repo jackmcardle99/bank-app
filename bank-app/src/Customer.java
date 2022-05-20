@@ -25,35 +25,37 @@ public class Customer {
     }
 
     public void validateApplication(){};
-    public int getTotalIDs(Connection conn) throws SQLException {
+    public int getNewID(Connection conn) throws SQLException {
         //This code below is getting the ID of the new customer, so we can add it to the credentials table
         PreparedStatement getMaxID = conn.prepareStatement("SELECT  MAX(custID) FROM customers");
         ResultSet rs = getMaxID.executeQuery();
         int id = 0;
         while(rs.next()){//set int as next ID num
-            id = rs.getInt(1);
+            id = rs.getInt(1) +1;
 
         }
         return id;
     }
     public void createCustomerProfile(Connection conn, String[] answersArr) throws SQLException {
+        Bank bankObj = new Bank();//obj for calling dbConnect method
         //Inserting new customer into customer table
-        PreparedStatement custStatement = conn.prepareStatement("INSERT INTO customers(prefix, forename, surname, " +
-                "gender, dob) VALUES (?,?,?,?,?);");
-        custStatement.setString(1, (String) Array.get(answersArr,0));
-        custStatement.setString(2,(String) Array.get(answersArr,1));
-        custStatement.setString(3,(String) Array.get(answersArr,2));
-        custStatement.setString(4,(String) Array.get(answersArr,3));
-        custStatement.setString(5, (String) Array.get(answersArr,4));
+        int newID = this.getNewID(bankObj.dbConnect());
+        PreparedStatement custStatement = conn.prepareStatement("INSERT INTO customers(custID,prefix, forename, surname, " +
+                "gender, dob) VALUES (?,?,?,?,?,?);");
+        custStatement.setInt(1,newID);
+        custStatement.setString(2, (String) Array.get(answersArr,0));
+        custStatement.setString(3,(String) Array.get(answersArr,1));
+        custStatement.setString(4,(String) Array.get(answersArr,2));
+        custStatement.setString(5,(String) Array.get(answersArr,3));
+        custStatement.setString(6, (String) Array.get(answersArr,4));
         custStatement.executeUpdate();
 
         //inserting customer details into credential tables
-        Bank bankObj = new Bank();//obj for calling dbConnect method
         PreparedStatement credStatement = conn.prepareStatement("INSERT INTO credentials (username,password,custID)" +
                 "VALUES (?,?,?)");
         credStatement.setString(1,(String) Array.get(answersArr,5));
         credStatement.setString(2,(String) Array.get(answersArr,6));
-        credStatement.setInt(3,this.getTotalIDs(bankObj.dbConnect()));
+        credStatement.setInt(3,newID);
         credStatement.executeUpdate();
     }
     public boolean findUser(Connection conn,String user) throws SQLException {
