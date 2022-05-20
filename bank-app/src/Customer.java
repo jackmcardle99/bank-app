@@ -1,5 +1,6 @@
 import jdk.swing.interop.SwingInterOpUtils;
 
+import java.lang.reflect.Array;
 import java.sql.*;
 
 public class Customer {
@@ -23,6 +24,20 @@ public class Customer {
         return custID + " | " + prefix + "| " + forename + " | " + surname + " | " + gender + " | " + dob;
     }
 
+    public void validateApplication(){};
+
+    public void createCustomerProfile(Connection conn, String[] answersArr) throws SQLException {
+        PreparedStatement custStatement = conn.prepareStatement("INSERT INTO customers(prefix, forename, surname, gender, dob) VALUES (?,?,?,?,?);");
+        custStatement.setString(1, (String) Array.get(answersArr,0));
+        custStatement.setString(2,(String) Array.get(answersArr,1));
+        custStatement.setString(3,(String) Array.get(answersArr,2));
+        custStatement.setString(4,(String) Array.get(answersArr,3));
+        custStatement.setString(5, (String) Array.get(answersArr,4));
+        custStatement.executeUpdate();
+
+        //still have to update the credentials table with user, pass + custid!!!!!!
+
+    }
     public boolean findUser(Connection conn,String user) throws SQLException {
         PreparedStatement statement = conn.prepareStatement("SELECT username FROM credentials WHERE username = ?");
         statement.setString(1,user);

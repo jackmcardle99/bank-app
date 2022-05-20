@@ -2,7 +2,6 @@ import java.util.Scanner;
 import java.sql.*;
 
 public class Bank {
-    //Customer cus1 = new Customer(01,"Mr", "Jack", "McArdle", "Male", "1999-06-23");
     private Scanner scan = new Scanner(System.in);
     private Customer customer = new Customer(); //for calling customer class methods
     private Customer session; //assigned when logged in, this is for the currently logged in customer
@@ -28,7 +27,7 @@ public class Bank {
                 break;
             }
             if (input.equals("2")){
-                this.applyForm();
+                customer.createCustomerProfile(this.dbConnect(),this.applyForm());
             }
             if (input.equals("3")) {
                 System.out.println("Goodbye!");
@@ -66,15 +65,16 @@ public class Bank {
         this.home();
     }
 
-    private void applyForm(){
-        String[]questions = {"Please enter in your title e.g. (Mr/Ms/Mrs","Please enter in your forename.", "Please enter in your surname.","Please enter in your gender e.g. (Male/Female)","Please Enter your date of birth. e.g. (YYYY-MM-DD)","Please enter in your new username. Cannot be longer than 15 characters.","Please enter in your new password. Cannot be longer than 15 characters."};
-        String[]answers;
-        //create for loop here which prints a question on each iteration, and adds answer to answer array
-        //COULD POSSIBLY CREATE HASHMAP?? QUESTIONS = KEY ANSWERS = VALUE?
-//        for (String lines : questions){
-//            System.out.println(lines);
-//        }
+    private String[] applyForm(){
+        String[]questionsArr = {"Please enter in your title e.g. (Mr/Ms/Mrs","Please enter in your forename.", "Please enter in your surname.","Please enter in your gender e.g. (Male/Female)","Please Enter your date of birth. e.g. (YYYY-MM-DD)","Please enter in your new username. Cannot be longer than 15 characters.","Please enter in your new password. Cannot be longer than 15 characters."};
+        String[]answersArr = new String[questionsArr.length];
 
+        for (int i = 0; i < questionsArr.length; i++){
+            System.out.println(questionsArr[i]);
+            String answer = scan.nextLine();
+            answersArr[i] = answer;
+        }
+        return answersArr;
     }
 
     private void createProfile(){
