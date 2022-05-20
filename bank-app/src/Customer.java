@@ -24,10 +24,9 @@ public class Customer {
     }
 
     public boolean findUser(Connection conn,String user) throws SQLException {
-        String passQuery = "select * from (SELECT username FROM credentials" + //sql query to search database for username passed
-                " WHERE username =" + " " + "\"" + user + "\") cu";
-        Statement statement = conn.createStatement(); //
-        ResultSet rs = statement.executeQuery(passQuery); //save results of statement to rs
+        PreparedStatement statement = conn.prepareStatement("SELECT username FROM credentials WHERE username = ?");
+        statement.setString(1,user);
+        ResultSet rs = statement.executeQuery(); //save results of statement to rs
         if (rs.next()) { //rs.next checks to see if results from query
             do {
                 return true;
@@ -40,14 +39,13 @@ public class Customer {
     }
 
     public boolean findPass(Connection conn, String pass,String user){
-        String passQuery = "select * from (SELECT password FROM CREDENTIALS WHERE password = " + "\"" + pass + "\"" + " AND " +
-                "username = " + "\"" + user + "\") Cp";
         try {
-            Statement statement = conn.createStatement();
-            ResultSet rs = statement.executeQuery(passQuery);
+            PreparedStatement statement = conn.prepareStatement("SELECT password FROM credentials WHERE password = ? AND username = ?");
+            statement.setString(1,pass);
+            statement.setString(2,user);
+            ResultSet rs = statement.executeQuery();
             if(rs.next()){
                 do {
-                    System.out.println("ye");
                     return true;
                 }while (rs.next());
             }
@@ -61,14 +59,36 @@ public class Customer {
     }
 
     public int getUserID(Connection conn, String user) throws SQLException {
-        String setUserQuery = "SELECT custID FROM credentials WHERE username = " + "\"" + user + "\"";
-        Statement statement = conn.createStatement();
-        ResultSet rs = statement.executeQuery(setUserQuery);
+        PreparedStatement statement = conn.prepareStatement("SELECT custID FROM credentials WHERE username = ?");
+        statement.setString(1,user);
+        ResultSet rs = statement.executeQuery();
         while(rs.next()){
             int userID = rs.getInt("custID");
             return userID;
         }
         return 0;
+    }
+
+    public Customer getCustomerProfile(Connection conn,int userID) throws SQLException {
+        PreparedStatement statement = conn.prepareStatement("SELECT * FROM customers WHERE custID = ?");
+        statement.setInt(1,userID);
+        ResultSet rs = statement.executeQuery();
+        if (rs.next()){
+            do {
+                custID = rs.getInt("custID");
+                prefix = rs.getString("prefix");
+                forename = rs.getString("forename");
+                surname = rs.getString("surname");
+                gender = rs.getString("gender");
+                dob = rs.getDate("dob");
+                Customer currentSession = new Customer(custID,prefix,forename,surname,gender,dob);
+                return currentSession;
+            }while (rs.next());
+        }
+        else{
+            System.out.println("nay");
+        }
+        return null;
     }
 
     public int getCustID(){

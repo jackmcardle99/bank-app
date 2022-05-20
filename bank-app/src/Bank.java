@@ -3,8 +3,9 @@ import java.sql.*;
 
 public class Bank {
     //Customer cus1 = new Customer(01,"Mr", "Jack", "McArdle", "Male", "1999-06-23");
-    Scanner scan = new Scanner(System.in);
-    Customer customer = new Customer();
+    private Scanner scan = new Scanner(System.in);
+    private Customer customer = new Customer(); //for calling customer class methods
+    private Customer session; //assigned when logged in, this is for the currently logged in customer
 
 
 
@@ -24,6 +25,7 @@ public class Bank {
             }
             if(input.equals("1")){
                 this.logIn(dbConnect());
+                break;
             }
             if (input.equals("2")){
                 this.applyForm();
@@ -59,19 +61,19 @@ public class Bank {
                 String pass = scan.nextLine();
                 passFound = customer.findPass(this.dbConnect(),pass,user);
             }
-
         int userID = customer.getUserID(dbConnect(),user);
-        System.out.println(userID);
-
+        session = customer.getCustomerProfile(this.dbConnect(),userID);
+        this.home();
     }
 
     private void applyForm(){
         String[]questions = {"Please enter in your title e.g. (Mr/Ms/Mrs","Please enter in your forename.", "Please enter in your surname.","Please enter in your gender e.g. (Male/Female)","Please Enter your date of birth. e.g. (YYYY-MM-DD)","Please enter in your new username. Cannot be longer than 15 characters.","Please enter in your new password. Cannot be longer than 15 characters."};
         String[]answers;
         //create for loop here which prints a question on each iteration, and adds answer to answer array
-        for (String lines : questions){
-            System.out.println(lines);
-        }
+        //COULD POSSIBLY CREATE HASHMAP?? QUESTIONS = KEY ANSWERS = VALUE?
+//        for (String lines : questions){
+//            System.out.println(lines);
+//        }
 
     }
 
@@ -80,9 +82,9 @@ public class Bank {
     }
 
     private void home(){
-//        System.out.println("==================== Welcome to your Online Banking " + cus1.getPrefix() + " " + cus1.getSurname() +
-//                " =========================\n" +
-//                "Lists of accounts");
+        System.out.println("==================== Welcome to your Online Banking " + session.getPrefix() + " " + session.getSurname() +
+                " =========================\n" +
+                "Lists of accounts");
         Account acc1 = new Account("123","pro",01,200);
         System.out.println();
     }
