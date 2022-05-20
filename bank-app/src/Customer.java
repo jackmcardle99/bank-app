@@ -25,9 +25,21 @@ public class Customer {
     }
 
     public void validateApplication(){};
+    public int getTotalIDs(Connection conn) throws SQLException {
+        //This code below is getting the ID of the new customer, so we can add it to the credentials table
+        PreparedStatement getMaxID = conn.prepareStatement("SELECT  MAX(custID) FROM customers");
+        ResultSet rs = getMaxID.executeQuery();
+        int id = 0;
+        while(rs.next()){//set int as next ID num
+            id = rs.getInt(1);
 
+        }
+        return id;
+    }
     public void createCustomerProfile(Connection conn, String[] answersArr) throws SQLException {
-        PreparedStatement custStatement = conn.prepareStatement("INSERT INTO customers(prefix, forename, surname, gender, dob) VALUES (?,?,?,?,?);");
+        //Inserting new customer into customer table
+        PreparedStatement custStatement = conn.prepareStatement("INSERT INTO customers(prefix, forename, surname, " +
+                "gender, dob) VALUES (?,?,?,?,?);");
         custStatement.setString(1, (String) Array.get(answersArr,0));
         custStatement.setString(2,(String) Array.get(answersArr,1));
         custStatement.setString(3,(String) Array.get(answersArr,2));
@@ -35,8 +47,14 @@ public class Customer {
         custStatement.setString(5, (String) Array.get(answersArr,4));
         custStatement.executeUpdate();
 
-        //still have to update the credentials table with user, pass + custid!!!!!!
-
+        //inserting customer details into credential tables
+        Bank bankObj = new Bank();//obj for calling dbConnect method
+        PreparedStatement credStatement = conn.prepareStatement("INSERT INTO credentials (username,password,custID)" +
+                "VALUES (?,?,?)");
+        credStatement.setString(1,(String) Array.get(answersArr,5));
+        credStatement.setString(2,(String) Array.get(answersArr,6));
+        credStatement.setInt(3,this.getTotalIDs(bankObj.dbConnect()));
+        credStatement.executeUpdate();
     }
     public boolean findUser(Connection conn,String user) throws SQLException {
         PreparedStatement statement = conn.prepareStatement("SELECT username FROM credentials WHERE username = ?");
