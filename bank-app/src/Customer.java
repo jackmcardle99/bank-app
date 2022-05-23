@@ -4,6 +4,7 @@ import java.time.*;
 
 public class Customer {
 
+    private Database db = new Database();
     private int custID;
     private String prefix,forename,surname,gender, dob;
     public Customer(int custID, String prefix, String forename, String surname, String gender, String dob){
@@ -120,9 +121,8 @@ public class Customer {
         return id;
     }
     public void createCustomerProfile(Connection conn, String[] answersArr, String strDob) throws SQLException {
-        Bank bankObj = new Bank();//obj for calling dbConnect method
         //Inserting new customer into customer table
-        int newID = this.getNewID(bankObj.dbConnect());
+        int newID = this.getNewID(db.dbConnect());
         PreparedStatement custStatement = conn.prepareStatement("INSERT INTO customers(custID,prefix, forename, surname, " +
                 "gender, dob) VALUES (?,?,?,?,?,?);");
         custStatement.setInt(1,newID);

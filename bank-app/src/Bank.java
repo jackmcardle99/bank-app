@@ -7,6 +7,7 @@ public class Bank {
     private final Scanner scan = new Scanner(System.in);
     private final Customer customer = new Customer(); //for calling customer class methods
     private Customer session; //assigned when logged in, this is for the currently logged in customer
+    private Database db = new Database();//instantiating Database class obj
 
 
 
@@ -30,8 +31,8 @@ public class Bank {
             if (input.equals("2")){
                 String strDob;
                 try {
-                    strDob = this.applyDOB();
-                    customer.createCustomerProfile(this.dbConnect(),this.applyForm(),strDob);
+                    strDob = this.applyFormDOB();
+                    customer.createCustomerProfile(db.dbConnect(),this.applyForm(),strDob);
                 }catch (NumberFormatException e){
                     System.out.println(e);
                     System.out.println("Please only enter numbers for DOB");
@@ -42,15 +43,7 @@ public class Bank {
             }
         }
     }
-    public Connection dbConnect(){
-        try{
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            return DriverManager.getConnection("jdbc:mysql://localhost:3306/bank_db","root","76647664");
-        }
-        catch (Exception e ){
-            throw new RuntimeException("Can't connect to database.",e);
-        }
-    }
+
     private void logIn() throws SQLException {
         boolean userFound = false, passFound = false;
         String user = null;
@@ -58,19 +51,19 @@ public class Bank {
         {
             System.out.println("Please enter in your username.");
             user = scan.nextLine();
-            userFound = customer.findUser(this.dbConnect(),user);
+            userFound = customer.findUser(db.dbConnect(),user);
         }
             while (!passFound){
                 System.out.println("Please enter in the password for " + user);
                 String pass = scan.nextLine();
-                passFound = customer.findPass(this.dbConnect(),pass,user);
+                passFound = customer.findPass(db.dbConnect(),pass,user);
             }
-        int userID = customer.getUserID(dbConnect(),user);
-        session = customer.getCustomerProfile(this.dbConnect(),userID);
+        int userID = customer.getUserID(db.dbConnect(), user);
+        session = customer.getCustomerProfile(db.dbConnect(),userID);
         this.home();
     }
 
-    private String applyDOB(){
+    private String applyFormDOB(){
         String strDay,strMonth,strYear;
         LocalDate dateDob;
         String strDate;
