@@ -1,3 +1,5 @@
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 import java.sql.*;
 
@@ -26,8 +28,14 @@ public class Bank {
                 break;
             }
             if (input.equals("2")){
-                this.applyForm();
-                //customer.createCustomerProfile(this.dbConnect(),this.applyForm());
+                String strDob;
+                try {
+                    strDob = this.applyDOB();
+                    customer.createCustomerProfile(this.dbConnect(),this.applyForm(),strDob);
+                }catch (NumberFormatException e){
+                    System.out.println(e);
+                    System.out.println("Please only enter numbers for DOB");
+                }
             }
             if (input.equals("3")) {
                 System.out.println("Goodbye!");
@@ -62,27 +70,51 @@ public class Bank {
         this.home();
     }
 
+    private String applyDOB(){
+        String strDay,strMonth,strYear;
+        LocalDate dateDob;
+        String strDate;
+
+        while (true){
+            System.out.println("Please enter your day of birth");
+            strDay = scan.nextLine();
+            System.out.println("Please enter your month of birth");
+            strMonth = scan.nextLine();
+            System.out.println("Please enter your year of birth");
+            strYear = scan.nextLine();
+
+            if (customer.validateDob(strDay,strMonth,strYear) == true){
+                int day = Integer.parseInt(strDay);
+                int month = Integer.parseInt(strMonth);  // 1-12 for January-December.
+                int year = Integer.parseInt(strYear);
+                dateDob = LocalDate.of(year,month,day);
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");//date formatter object
+                strDate = dateDob.format(formatter);//string is date with the format applied
+                break;
+            }
+        }
+        return strDate;
+    }
+
     private String[] applyForm(){
         String[]questionsArr = {"Please enter in your title e.g. (Mr/Ms/Mrs)","Please enter in your " +
-                "forename.", "Please enter in your surname.","Please enter in your gender e.g. (Male/Female)" +
-                "","Please Enter your date of birth. e.g. (YYYY-MM-DD)","Please enter in your new username. Cannot be " +
-                "longer than 15 characters.","Please enter in your new password. Cannot be longer than 15 characters."};
+                "forename.", "Please enter in your surname.","Please enter in your gender e.g. (Male/Female)","Please " +
+                "enter in your new username. Cannot be " +
+                "longer than 15 characters.","Please enter in your new password. Password can contain special characters " +
+                "but cannot be longer than 15 characters."};
         String[]answersArr = new String[questionsArr.length];
-        boolean dontProceed = true;
         int count = 0;
         for (int i = 0; i < questionsArr.length; i++){
             while (true){
                 System.out.println(questionsArr[i]);
                 String answer = scan.nextLine();
                 answersArr[i] = answer;
-                //boolean test = customer.validateApplication(answersArr);
                 if (customer.validateApplication(answersArr[i],count)){
                     break;
                 }
             }
             count ++;
             }
-        //customer.validateApplication(answersArr);
         return answersArr;
     }
 
