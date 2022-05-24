@@ -1,19 +1,28 @@
+import java.time.Clock;
+import java.time.DateTimeException;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 import java.sql.*;
 
 public class Bank {
+    private final LocalDate currentDate = LocalDate.now(Clock.systemUTC());
+    private final LocalTime currentTime = LocalTime.now();
+    DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+    DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
     private final Scanner scan = new Scanner(System.in);
     private final Customer customer = new Customer(); //for calling customer class methods
     private Customer session; //assigned when logged in, this is for the currently logged in customer
-    private Database db = new Database();//instantiating Database class obj
+    private final Database db = new Database();//instantiating Database class obj
 
 
 
     public static void main(String[] args) throws SQLException {
         Bank app = new Bank();
         app.menu();
+
+
     }
 
     private void menu() throws SQLException {
@@ -32,10 +41,9 @@ public class Bank {
                 String strDob;
                 try {
                     strDob = this.applyFormDOB();
-                    customer.createCustomerProfile(db.dbConnect(),this.applyForm(),strDob);
-                }catch (NumberFormatException e){
-                    System.out.println(e);
-                    System.out.println("Please only enter numbers for DOB");
+                    db.createCustomerProfile(db.dbConnect(),this.applyForm(),strDob);
+                }catch (NumberFormatException | DateTimeException e){
+                    System.out.println(e.getMessage() + ". Please enter a valid date.");
                 }
             }
             if (input.equals("3")) {
@@ -51,16 +59,20 @@ public class Bank {
         {
             System.out.println("Please enter in your username.");
             user = scan.nextLine();
-            userFound = customer.findUser(db.dbConnect(),user);
+            userFound = db.findUserProfile(db.dbConnect(),user);
         }
             while (!passFound){
                 System.out.println("Please enter in the password for " + user);
                 String pass = scan.nextLine();
-                passFound = customer.findPass(db.dbConnect(),pass,user);
+                passFound = db.findPass(db.dbConnect(),pass,user);
             }
-        int userID = customer.getUserID(db.dbConnect(), user);
-        session = customer.getCustomerProfile(db.dbConnect(),userID);
-        this.home();
+        int userID = db.getUserSessionID(db.dbConnect(), user);
+        session = db.getCustomerProfile(db.dbConnect(),userID);
+        try {
+            this.home();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private String applyFormDOB(){
@@ -76,9 +88,9 @@ public class Bank {
             System.out.println("Please enter your year of birth");
             strYear = scan.nextLine();
 
-            if (customer.validateDob(strDay,strMonth,strYear) == true){
+            if (customer.validateDob(strDay,strMonth,strYear)){//if method returns true
                 int day = Integer.parseInt(strDay);
-                int month = Integer.parseInt(strMonth);  // 1-12 for January-December.
+                int month = Integer.parseInt(strMonth);
                 int year = Integer.parseInt(strYear);
                 dateDob = LocalDate.of(year,month,day);
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");//date formatter object
@@ -98,23 +110,28 @@ public class Bank {
         String[]answersArr = new String[questionsArr.length];
         int count = 0;
         for (int i = 0; i < questionsArr.length; i++){
-            while (true){
+            do {
                 System.out.println(questionsArr[i]);
                 String answer = scan.nextLine();
                 answersArr[i] = answer;
-                if (customer.validateApplication(answersArr[i],count)){
-                    break;
-                }
-            }
+            } while (!customer.validateApplication(answersArr[i], count));
             count ++;
             }
         return answersArr;
     }
 
-    private void home(){
-        System.out.println("==================== Welcome to your Online Banking " + session.getPrefix() + " " + session.getSurname() +
-                " =========================\n" +
-                "Lists of accounts");
-        System.out.println();
+    private void home() throws InterruptedException {
+        String userInput;
+        while (true){//this loop condition will change in future, true for the purposes of seeing the home menu atm
+            String strTime = currentTime.format(timeFormatter);
+            String strDate = currentDate.format(dateFormatter);
+
+            System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+            System.out.println("==================== Welcome to your Online Banking " + session.getPrefix() + " " +
+                    "" + session.getSurname() +
+                    " =========================\n" +
+                    "Date: " + strDate + "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t Time: " + strTime);
+            Thread.sleep(60000);//update thread every minute to update time
+        }
     }
 }
