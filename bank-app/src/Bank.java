@@ -28,7 +28,7 @@ public class Bank {
     private void menu() throws SQLException {
         String input = "";
         while (!input.equals("3")) {
-            System.out.println("(1) Log in\n(2) Apply for Account\n(3) Exit");
+            System.out.println("(1) Log in\n(2) Apply for Profile\n(3) Exit");
             input = scan.nextLine();
             if (!input.equals("1") && !input.equals("2") && !input.equals("3")) {
                 System.out.println("Please enter valid input, either 1 or 2.");
@@ -119,21 +119,64 @@ public class Bank {
             }
         return answersArr;
     }
+// THIS METHOD IS THE MENU WITH WORKING CLOCK, BUT HAS PROBLEM WITH WAITING FOR NEXT USER INPUT
+//    private void home() throws InterruptedException {
+//        String userInput;
+//
+//        while (true){//this loop condition will change in future, true for the purposes of seeing the home menu atm
+//            final LocalTime currentTime = LocalTime.now();
+//            String strTime = currentTime.format(timeFormatter);
+//            String strDate = currentDate.format(dateFormatter);
+//
+//            System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+//            System.out.println("==================== Welcome to your Online Banking " + session.getPrefix() + " " +
+//                    "" + session.getSurname() +
+//                    " =========================\n" +
+//                    "Date: " + strDate + "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t Time: " + strTime);
+//            Thread.sleep(60000);//update thread every minute to update time
+//        }
+//    }
 
-    private void home() throws InterruptedException {
-        String userInput;
-
-        while (true){//this loop condition will change in future, true for the purposes of seeing the home menu atm
-            final LocalTime currentTime = LocalTime.now();
-            String strTime = currentTime.format(timeFormatter);
-            String strDate = currentDate.format(dateFormatter);
-
-            System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
-            System.out.println("==================== Welcome to your Online Banking " + session.getPrefix() + " " +
-                    "" + session.getSurname() +
-                    " =========================\n" +
-                    "Date: " + strDate + "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t Time: " + strTime);
-            Thread.sleep(60000);//update thread every minute to update time
+    private void openAccForm(){
+        String userChoice, accChoice;
+        int initialBalance;
+        //ask if they want to open pro or standard (if they choose pro min deposit is 500)
+        //(cust can only have 1 pro acc)
+        //ask them how much they would like to deposit initially
+        System.out.println("Would you like to open a Professional or Standard account? (You may only have 1 professional" +
+                " account, and it must be opened with a minimum balance of £500" +
+                ")\n(1) Standard Account\n(2) Professional Account");
+        userChoice = scan.nextLine();
+        if (userChoice.equals("1")){
+            accChoice = "standard";
+            System.out.print("Please enter your initial deposit amount. Can be 0.\nEnter amount: ");
+            initialBalance = scan.nextInt();
+        } else if (userChoice.equals("2")) {
+            accChoice = "pro";
+            System.out.print("Please fund your account with £500 minimum.\nEnter amount: ");
+            initialBalance = scan.nextInt();
         }
+
     }
+private void home() throws InterruptedException {
+    String userInput;
+
+    while (true){//this loop condition will change in future, true for the purposes of seeing the home menu atm
+        final LocalTime currentTime = LocalTime.now();
+        String strTime = currentTime.format(timeFormatter);
+        String strDate = currentDate.format(dateFormatter);
+
+        System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+        System.out.println("==================== Welcome to your Online Banking " + session.getPrefix() + " " +
+                "" + session.getSurname() +
+                " =========================\n" +
+                "Date: " + strDate + "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t Time: " + strTime + "\nEnter what you would" +
+                "like to do.\n(1) Open Account");
+        userInput = scan.nextLine();
+        if (userInput.equals("1")){
+            this.openAccForm();
+        }
+
+    }
+}
 }

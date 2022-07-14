@@ -11,4 +11,8 @@ public class Account {
         this.balance = balance;
     }
 
+    public boolean validateAccount(String type, int initBalance){
+        // this method will validate the account opening application
+        return false;
+    }
 }
