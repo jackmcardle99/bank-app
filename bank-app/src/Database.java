@@ -9,7 +9,7 @@ public class Database {
             Class.forName("com.mysql.cj.jdbc.Driver");
             return DriverManager.getConnection("jdbc:mysql://localhost:3306/bank_db","root","76647664");
         }
-        catch (Exception e ){
+        catch (SQLException | ClassNotFoundException e){
             throw new RuntimeException("Can't connect to database.",e);
         }
     }

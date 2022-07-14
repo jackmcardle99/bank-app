@@ -8,7 +8,7 @@ import java.sql.*;
 
 public class Bank {
     private final LocalDate currentDate = LocalDate.now(Clock.systemUTC());
-    private final LocalTime currentTime = LocalTime.now();
+
     DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
     DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
     private final Scanner scan = new Scanner(System.in);
@@ -122,7 +122,9 @@ public class Bank {
 
     private void home() throws InterruptedException {
         String userInput;
+
         while (true){//this loop condition will change in future, true for the purposes of seeing the home menu atm
+            final LocalTime currentTime = LocalTime.now();
             String strTime = currentTime.format(timeFormatter);
             String strDate = currentDate.format(dateFormatter);
 
