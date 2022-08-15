@@ -138,6 +138,7 @@ public class Bank {
 //    }
 
     private void openAccForm(){
+        Account acc = new Account();
         String userChoice, accChoice;
         int initialBalance;
         //ask if they want to open pro or standard (if they choose pro min deposit is 500)
@@ -146,16 +147,34 @@ public class Bank {
         System.out.println("Would you like to open a Professional or Standard account? (You may only have 1 professional" +
                 " account, and it must be opened with a minimum balance of £500" +
                 ")\n(1) Standard Account\n(2) Professional Account");
-        userChoice = scan.nextLine();
-        if (userChoice.equals("1")){
-            accChoice = "standard";
-            System.out.print("Please enter your initial deposit amount. Can be 0.\nEnter amount: ");
-            initialBalance = scan.nextInt();
-        } else if (userChoice.equals("2")) {
-            accChoice = "pro";
-            System.out.print("Please fund your account with £500 minimum.\nEnter amount: ");
-            initialBalance = scan.nextInt();
+        boolean validated = false;
+        while (validated == false){
+            userChoice = scan.nextLine();
+            if (userChoice.equals("1")){
+                accChoice = "standard";
+                while(true){
+                    System.out.print("Please enter your initial deposit amount. Can be 0.\nEnter amount: ");
+                    initialBalance = scan.nextInt();
+                    if (initialBalance < 0){
+                        System.out.println("Can't add negative funds.");
+                    }
+                    else{
+                        break;
+                    }
+                }
+
+                validated = acc.validateAccount(accChoice,initialBalance);
+                System.out.println(validated);
+
+            } else if (userChoice.equals("2")) {
+                accChoice = "pro";
+                System.out.print("Please fund your account with £500 minimum.\nEnter amount: ");
+                initialBalance = scan.nextInt();
+                validated = acc.validateAccount(accChoice,initialBalance);
+                System.out.println(validated);
+            }
         }
+
 
     }
 private void home() throws InterruptedException {
@@ -176,6 +195,8 @@ private void home() throws InterruptedException {
         if (userInput.equals("1")){
             this.openAccForm();
         }
+
+
 
     }
 }
