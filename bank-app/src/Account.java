@@ -15,6 +15,10 @@ public class Account {
     public Account(){}; //contructor overloading
     public boolean validateAccount(String type, int initBalance){
         // this method will validate the account opening application
+            if (type.equals("standard") && initBalance < 0){
+                System.out.println("Can't add negative funds.");
+                return false;
+            }
             if (type.equals("pro") && initBalance < 500){
                 System.out.println("Please ensure you fund the account with at least 500");
                 return false;

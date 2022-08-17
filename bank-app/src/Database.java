@@ -106,4 +106,8 @@ public class Database {
         return currentSession;
     }
 
+    public void createCustAccount(Connection conn, int cust, String type, int initBal) throws SQLException {
+        PreparedStatement statement = conn.prepareStatement("INSERT INTO accounts ()");
+    }
+
 }

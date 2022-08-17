@@ -137,47 +137,36 @@ public class Bank {
 //        }
 //    }
 
-    private void openAccForm(){
+    private void openAccForm() throws SQLException {
         Account acc = new Account();
-        String userChoice, accChoice;
-        int initialBalance;
+        String userChoice, accChoice = null;
+        int initialBalance = 0;
         //ask if they want to open pro or standard (if they choose pro min deposit is 500)
         //(cust can only have 1 pro acc)
         //ask them how much they would like to deposit initially
         System.out.println("Would you like to open a Professional or Standard account? (You may only have 1 professional" +
                 " account, and it must be opened with a minimum balance of £500" +
                 ")\n(1) Standard Account\n(2) Professional Account");
+        userChoice = scan.nextLine();
         boolean validated = false;
-        while (validated == false){
-            userChoice = scan.nextLine();
+        do { //do-while loop for initial deposit into account, calling validate method from account class
             if (userChoice.equals("1")){
                 accChoice = "standard";
-                while(true){
-                    System.out.print("Please enter your initial deposit amount. Can be 0.\nEnter amount: ");
-                    initialBalance = scan.nextInt();
-                    if (initialBalance < 0){
-                        System.out.println("Can't add negative funds.");
-                    }
-                    else{
-                        break;
-                    }
-                }
-
+                System.out.print("Please enter your initial deposit amount. Can be 0.\nEnter amount: ");
+                initialBalance = scan.nextInt();
                 validated = acc.validateAccount(accChoice,initialBalance);
-                System.out.println(validated);
-
-            } else if (userChoice.equals("2")) {
+            }
+            else if (userChoice.equals("2")) {
                 accChoice = "pro";
                 System.out.print("Please fund your account with £500 minimum.\nEnter amount: ");
                 initialBalance = scan.nextInt();
                 validated = acc.validateAccount(accChoice,initialBalance);
-                System.out.println(validated);
             }
-        }
-
+        }while (validated == false);
+        db.createCustAccount(db.dbConnect(), session.getCustID(),accChoice,initialBalance);
 
     }
-private void home() throws InterruptedException {
+private void home() throws InterruptedException, SQLException {
     String userInput;
 
     while (true){//this loop condition will change in future, true for the purposes of seeing the home menu atm
