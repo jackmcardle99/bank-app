@@ -26,6 +26,8 @@ public class Database {
         return id;
     }
 
+
+
     public void createCustomerProfile(Connection conn, String[] answersArr, String strDob) throws SQLException {
         //Inserting new customer into customer table
         int newID = this.getNewID(this.dbConnect());
@@ -106,8 +108,27 @@ public class Database {
         return currentSession;
     }
 
+    public int getNewAccID(Connection conn) throws SQLException {
+        //This code below is getting the ID of the new account, so we can add it to the accounts table
+        PreparedStatement getMaxID = conn.prepareStatement("SELECT  MAX(accountNo) FROM accounts");
+        ResultSet rs = getMaxID.executeQuery();
+        int accNO = 0;
+        while(rs.next()){//set int as next ID num
+            accNO = rs.getInt(1) +1;
+
+        }
+        return accNO;
+    }
     public void createCustAccount(Connection conn, int cust, String type, int initBal) throws SQLException {
-        PreparedStatement statement = conn.prepareStatement("INSERT INTO accounts ()");
+        int newAccNo = this.getNewAccID(this.dbConnect());//getting new account number
+        System.out.println(newAccNo);
+        PreparedStatement statement = conn.prepareStatement("INSERT INTO accounts (accountNo,balance,accountType," +
+                "custID)VALUES (?,?,?,?)");
+        statement.setInt(1,newAccNo);
+        statement.setLong(2,initBal);
+        statement.setString(3,type);
+        statement.setInt(4,cust);
+        statement.executeUpdate();
     }
 
 }

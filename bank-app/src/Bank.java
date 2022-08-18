@@ -21,8 +21,6 @@ public class Bank {
     public static void main(String[] args) throws SQLException {
         Bank app = new Bank();
         app.menu();
-
-
     }
 
     private void menu() throws SQLException {
@@ -144,9 +142,10 @@ public class Bank {
         //ask if they want to open pro or standard (if they choose pro min deposit is 500)
         //(cust can only have 1 pro acc)
         //ask them how much they would like to deposit initially
-        System.out.println("Would you like to open a Professional or Standard account? (You may only have 1 professional" +
-                " account, and it must be opened with a minimum balance of £500" +
-                ")\n(1) Standard Account\n(2) Professional Account");
+        System.out.println("""
+                Would you like to open a Professional or Standard account? (You may only have 1 professional account, and it must be opened with a minimum balance of £500)
+                (1) Standard Account
+                (2) Professional Account""");
         userChoice = scan.nextLine();
         boolean validated = false;
         do { //do-while loop for initial deposit into account, calling validate method from account class
@@ -162,7 +161,7 @@ public class Bank {
                 initialBalance = scan.nextInt();
                 validated = acc.validateAccount(accChoice,initialBalance);
             }
-        }while (validated == false);
+        }while (!validated);
         db.createCustAccount(db.dbConnect(), session.getCustID(),accChoice,initialBalance);
 
     }
@@ -179,10 +178,13 @@ private void home() throws InterruptedException, SQLException {
                 "" + session.getSurname() +
                 " =========================\n" +
                 "Date: " + strDate + "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t Time: " + strTime + "\nEnter what you would" +
-                "like to do.\n(1) Open Account");
+                "like to do.\n(1) Open Account\n(5)Exit");
         userInput = scan.nextLine();
         if (userInput.equals("1")){
             this.openAccForm();
+        }
+        else if (userInput.equals("5")){
+            break;
         }
 
 
