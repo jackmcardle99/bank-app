@@ -167,7 +167,7 @@ public class Bank {
     }
 private void home() throws InterruptedException, SQLException {
     String userInput;
-
+/// ARRAYLIST FOR STORING AND DISPLAYING CUSTOMER ACCOUNTS HERE
     while (true){//this loop condition will change in future, true for the purposes of seeing the home menu atm
         final LocalTime currentTime = LocalTime.now();
         String strTime = currentTime.format(timeFormatter);
@@ -179,6 +179,10 @@ private void home() throws InterruptedException, SQLException {
                 " =========================\n" +
                 "Date: " + strDate + "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t Time: " + strTime + "\nEnter what you would" +
                 "like to do.\n(1) Open Account\n(5)Exit");
+        //need to create sql query that searches for all accounts beloning to currently logged in customer - using
+        // the session.getCustID variable - e.g. SELECT * FROM ACCOUNTS WHERE CUSTID = ....
+        // Then add them into an ArrayList for manipulation of data
+        // after that's done, then proceed to allow customer to add balance etc..
         userInput = scan.nextLine();
         if (userInput.equals("1")){
             this.openAccForm();

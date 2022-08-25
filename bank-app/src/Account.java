@@ -28,4 +28,8 @@ public class Account {
                 //account validated - then create account in table
             }
     }
+
+    public Account findCustAccount(){
+        return null;
+    }
 }
