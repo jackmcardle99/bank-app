@@ -1,8 +1,8 @@
 import java.lang.reflect.Array;
 import java.sql.*;
+import java.util.ArrayList;
 
 public class Database {
-
     //method for connecting to mysql database
     public Connection dbConnect(){
         try{
@@ -129,6 +129,20 @@ public class Database {
         statement.setString(3,type);
         statement.setInt(4,cust);
         statement.executeUpdate();
+    }
+
+    public ArrayList<Account> findAccounts(Connection conn, int custID) throws SQLException {
+        Account account = new Account();
+        ArrayList<Account> accountList = new ArrayList<Account>();
+        PreparedStatement statement = conn.prepareStatement("SELECT * FROM accounts WHERE custID = ?");
+        statement.setInt(1,custID);
+        ResultSet rs = statement.executeQuery();
+        while (rs.next()){
+            //dont forget to sort accounts based on accountype here!!!!
+            account = new Account(rs.getString("accountNo"),rs.getDouble("balance"),rs.getString("accountType"),rs.getInt("custID"));
+            accountList.add(account);
+        }
+        return accountList;
     }
 
 }

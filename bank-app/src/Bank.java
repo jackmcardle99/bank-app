@@ -3,6 +3,7 @@ import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.sql.*;
 
@@ -172,6 +173,14 @@ private void home() throws InterruptedException, SQLException {
         final LocalTime currentTime = LocalTime.now();
         String strTime = currentTime.format(timeFormatter);
         String strDate = currentDate.format(dateFormatter);
+
+        Account acc = new Account();
+        ArrayList<Account> accountList = db.findAccounts(db.dbConnect(), session.getCustID()); //adding accounts to the arraylist
+
+        for (Account lol : accountList)
+        {
+            System.out.println(lol.AcctoString());
+        }
 
         System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
         System.out.println("==================== Welcome to your Online Banking " + session.getPrefix() + " " +

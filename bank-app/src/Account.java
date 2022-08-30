@@ -1,15 +1,16 @@
+import java.util.ArrayList;
 public class Account {
 
     private String accountNo, accountType;
     private int custID;
     private double balance;
+    ArrayList<Account> accountList = new ArrayList<Account>(); //instantiating arraylist
 
-
-    public Account(String accountNo, String accountType, int custID, double balance){
+    public Account(String accountNo, double balance, String accountType, int custID){
         this.accountNo = accountNo;
+        this.balance = balance;
         this.accountType = accountType;
         this.custID = custID;
-        this.balance = balance;
     }
 
     public Account(){}; //contructor overloading
@@ -29,7 +30,16 @@ public class Account {
             }
     }
 
+    public String AcctoString(){
+        String accountOutput = "Account Number: " + this.accountNo + ", " + "Balance: " + this.balance + ", " +
+                "Account Type: " + this.accountType + ", " + "Customer ID: " + this.custID;
+        return accountOutput;
+    }
     public Account findCustAccount(){
         return null;
+    }
+
+    public ArrayList<Account> getAccountList() {
+        return accountList;
     }
 }
