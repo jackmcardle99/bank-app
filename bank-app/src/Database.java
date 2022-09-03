@@ -145,4 +145,9 @@ public class Database {
         return accountList;
     }
 
+    public void fundAccount(Connection conn){
+        System.out.println("");
+        //this method will be for funding accounts
+    }
+
 }

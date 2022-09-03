@@ -118,23 +118,6 @@ public class Bank {
             }
         return answersArr;
     }
-// THIS METHOD IS THE MENU WITH WORKING CLOCK, BUT HAS PROBLEM WITH WAITING FOR NEXT USER INPUT
-//    private void home() throws InterruptedException {
-//        String userInput;
-//
-//        while (true){//this loop condition will change in future, true for the purposes of seeing the home menu atm
-//            final LocalTime currentTime = LocalTime.now();
-//            String strTime = currentTime.format(timeFormatter);
-//            String strDate = currentDate.format(dateFormatter);
-//
-//            System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
-//            System.out.println("==================== Welcome to your Online Banking " + session.getPrefix() + " " +
-//                    "" + session.getSurname() +
-//                    " =========================\n" +
-//                    "Date: " + strDate + "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t Time: " + strTime);
-//            Thread.sleep(60000);//update thread every minute to update time
-//        }
-//    }
 
     private void openAccForm() throws SQLException {
         Account acc = new Account();
@@ -166,10 +149,21 @@ public class Bank {
         db.createCustAccount(db.dbConnect(), session.getCustID(),accChoice,initialBalance);
 
     }
+
+    private Account selectAccount(ArrayList<Account> acc){
+        String selectedAcc;
+        for (Account accs : acc){ //listing the accounts the user has
+            System.out.println(accs.AcctoString());
+        }
+        System.out.println("Which account would you like to select?\nEnter the account number.");
+        selectedAcc = scan.nextLine();
+        return null;
+    }
 private void home() throws InterruptedException, SQLException {
     String userInput;
 /// ARRAYLIST FOR STORING AND DISPLAYING CUSTOMER ACCOUNTS HERE
-    while (true){//this loop condition will change in future, true for the purposes of seeing the home menu atm
+    label:
+    while (true){//this loop condition will change in the future, true for the purposes of seeing the home menu atm
         final LocalTime currentTime = LocalTime.now();
         String strTime = currentTime.format(timeFormatter);
         String strDate = currentDate.format(dateFormatter);
@@ -177,27 +171,39 @@ private void home() throws InterruptedException, SQLException {
         Account acc = new Account();
         ArrayList<Account> accountList = db.findAccounts(db.dbConnect(), session.getCustID()); //adding accounts to the arraylist
 
-        for (Account lol : accountList)
-        {
-            System.out.println(lol.AcctoString());
-        }
-
         System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
         System.out.println("==================== Welcome to your Online Banking " + session.getPrefix() + " " +
                 "" + session.getSurname() +
                 " =========================\n" +
-                "Date: " + strDate + "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t Time: " + strTime + "\nEnter what you would" +
-                "like to do.\n(1) Open Account\n(5)Exit");
+                "Date: " + strDate + "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t Time: " + strTime);
+        System.out.println("-- Your Accounts --\n");
+        for (Account lol : accountList)
+        { //this for-loop is printing out to string all the customer's accounts in the home menu
+            System.out.println(lol.AcctoString());
+        }
+        System.out.println("""
+
+                Enter what you would like to do.
+                (1)Fund an Account
+                (4)Open Account
+                (5)Exit""");
         //need to create sql query that searches for all accounts beloning to currently logged in customer - using
         // the session.getCustID variable - e.g. SELECT * FROM ACCOUNTS WHERE CUSTID = ....
         // Then add them into an ArrayList for manipulation of data
         // after that's done, then proceed to allow customer to add balance etc..
         userInput = scan.nextLine();
-        if (userInput.equals("1")){
-            this.openAccForm();
-        }
-        else if (userInput.equals("5")){
-            break;
+        switch (userInput) {
+            case "1":
+                this.selectAccount(accountList);//this method allows the user to select which account they want to modify
+
+                db.fundAccount(db.dbConnect());
+                break;
+            case "4":
+                this.openAccForm();
+                break;
+            case "5":
+                System.out.println("Goodbye!");
+                break label;
         }
 
 

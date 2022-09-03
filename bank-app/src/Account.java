@@ -32,7 +32,7 @@ public class Account {
 
     public String AcctoString(){
         String accountOutput = "Account Number: " + this.accountNo + ", " + "Balance: " + this.balance + ", " +
-                "Account Type: " + this.accountType + ", " + "Customer ID: " + this.custID;
+                "Account Type: " + this.accountType;
         return accountOutput;
     }
     public Account findCustAccount(){
