@@ -1,8 +1,11 @@
 import java.lang.reflect.Array;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class Database {
+
+    private Scanner scan = new Scanner(System.in);
     //method for connecting to mysql database
     public Connection dbConnect(){
         try{
@@ -21,12 +24,9 @@ public class Database {
         int id = 0;
         while(rs.next()){//set int as next ID num
             id = rs.getInt(1) +1;
-
         }
         return id;
     }
-
-
 
     public void createCustomerProfile(Connection conn, String[] answersArr, String strDob) throws SQLException {
         //Inserting new customer into customer table
@@ -131,23 +131,35 @@ public class Database {
         statement.executeUpdate();
     }
 
-    public ArrayList<Account> findAccounts(Connection conn, int custID) throws SQLException {
-        Account account = new Account();
-        ArrayList<Account> accountList = new ArrayList<Account>();
+    public ArrayList<Account> findUserAccounts(Connection conn, int custID) throws SQLException {
+        //Account account = new Account();
+        ArrayList<Account> accountList = new ArrayList<>();
         PreparedStatement statement = conn.prepareStatement("SELECT * FROM accounts WHERE custID = ?");
         statement.setInt(1,custID);
         ResultSet rs = statement.executeQuery();
         while (rs.next()){
-            //dont forget to sort accounts based on accountype here!!!!
-            account = new Account(rs.getString("accountNo"),rs.getDouble("balance"),rs.getString("accountType"),rs.getInt("custID"));
-            accountList.add(account);
+            if (rs.getString("accountType").equals("pro")){ //if the account is a pro account, create pro account object
+                ProfessionalAccount proAccount;
+                proAccount = new ProfessionalAccount(rs.getString("accountNo"),rs.getDouble("balance"),rs.getString("accountType"),rs.getInt("custID"));
+                accountList.add(proAccount); //creating an instance of pro account class
+            }
+            else{
+                StandardAccount stnAccount;
+                stnAccount = new StandardAccount(rs.getString("accountNo"),rs.getDouble("balance"),rs.getString("accountType"),rs.getInt("custID"));
+                accountList.add(stnAccount); //creating and instance of standard account class
+            }
         }
-        return accountList;
+        return accountList; //returning arraylist with the user's accounts
     }
 
-    public void fundAccount(Connection conn){
-        System.out.println("");
-        //this method will be for funding accounts
+    public void fundAccount(Connection conn, String accountNo) throws SQLException {
+        double fundAmount = 0;
+        System.out.println("How much would you liked to fund your account by?");
+        fundAmount = scan.nextDouble();
+        PreparedStatement fundStatement = conn.prepareStatement("UPDATE accounts SET balance = balance + ? WHERE accountNo = ?");
+        fundStatement.setDouble(1, fundAmount);
+        fundStatement.setString(2,accountNo);
+        fundStatement.executeUpdate();
     }
 
 }

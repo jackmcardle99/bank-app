@@ -150,13 +150,18 @@ public class Bank {
 
     }
 
-    private Account selectAccount(ArrayList<Account> acc){
+    private String selectAccount(ArrayList<Account> accArray){
         String selectedAcc;
-        for (Account accs : acc){ //listing the accounts the user has
+        System.out.println("Which account would you like to select?\nEnter the account number.");
+        for (Account accs : accArray){ //listing the accounts the user has
             System.out.println(accs.AcctoString());
         }
-        System.out.println("Which account would you like to select?\nEnter the account number.");
         selectedAcc = scan.nextLine();
+        for (Account accs : accArray){ //listing the accounts the user has
+            if (selectedAcc.equals(accs.getAccountNo())){
+                return accs.getAccountNo(); //return account if user's input matches an account number on record
+            }
+        }
         return null;
     }
 private void home() throws InterruptedException, SQLException {
@@ -167,20 +172,19 @@ private void home() throws InterruptedException, SQLException {
         final LocalTime currentTime = LocalTime.now();
         String strTime = currentTime.format(timeFormatter);
         String strDate = currentDate.format(dateFormatter);
-
-        Account acc = new Account();
-        ArrayList<Account> accountList = db.findAccounts(db.dbConnect(), session.getCustID()); //adding accounts to the arraylist
+        ArrayList<Account> accountList = db.findUserAccounts(db.dbConnect(), session.getCustID()); //adding accounts to the arraylist
 
         System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
         System.out.println("==================== Welcome to your Online Banking " + session.getPrefix() + " " +
                 "" + session.getSurname() +
                 " =========================\n" +
                 "Date: " + strDate + "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t Time: " + strTime);
-        System.out.println("-- Your Accounts --\n");
+        System.out.println("\n-- YOUR ACCOUNTS --");
         for (Account lol : accountList)
         { //this for-loop is printing out to string all the customer's accounts in the home menu
             System.out.println(lol.AcctoString());
         }
+        System.out.println("----------------------------");
         System.out.println("""
 
                 Enter what you would like to do.
@@ -194,9 +198,8 @@ private void home() throws InterruptedException, SQLException {
         userInput = scan.nextLine();
         switch (userInput) {
             case "1":
-                this.selectAccount(accountList);//this method allows the user to select which account they want to modify
-
-                db.fundAccount(db.dbConnect());
+                //this method allows the user to select which account they want to modify
+                db.fundAccount(db.dbConnect(),this.selectAccount(accountList));
                 break;
             case "4":
                 this.openAccForm();

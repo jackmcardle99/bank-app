@@ -30,9 +30,14 @@ public class Account {
             }
     }
 
-    public String AcctoString(){
+    public String AcctoString(){ //RENAME THIS METHOD
         String accountOutput = "Account Number: " + this.accountNo + ", " + "Balance: " + this.balance + ", " +
                 "Account Type: " + this.accountType;
+        return accountOutput;
+    }
+
+    public String AcctoString2(){ //RENAME THIS METHOD
+        String accountOutput = "Account Number: " + this.accountNo;
         return accountOutput;
     }
     public Account findCustAccount(){
@@ -41,5 +46,9 @@ public class Account {
 
     public ArrayList<Account> getAccountList() {
         return accountList;
+    }
+
+    public String getAccountNo(){
+        return this.accountNo;
     }
 }
