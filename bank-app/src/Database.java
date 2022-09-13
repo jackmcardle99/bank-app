@@ -119,6 +119,16 @@ public class Database {
         }
         return accNO;
     }
+
+    public int getNewPayeeID(Connection conn) throws SQLException {
+        int payeeNo = 0;
+        PreparedStatement getMaxID = conn.prepareStatement("SELECT MAX(payeeID) FROM payee");
+        ResultSet rs = getMaxID.executeQuery();
+        while (rs.next()){
+            payeeNo = rs.getInt(1) +1;
+        }
+        return payeeNo;
+    }
     public void createCustAccount(Connection conn, int cust, String type, int initBal) throws SQLException {
         int newAccNo = this.getNewAccID(this.dbConnect());//getting new account number
         System.out.println(newAccNo);
@@ -152,6 +162,16 @@ public class Database {
         return accountList; //returning arraylist with the user's accounts
     }
 
+    public boolean findPayeeAccount(Connection conn, int payeeAcc) throws SQLException {
+        //code in here for finding payee account, if account found - return true, else false
+        PreparedStatement statement = conn.prepareStatement("SELECT * FROM accounts WHERE accountNo = ?");
+        ResultSet rs = statement.executeQuery();
+
+
+        return false;
+    }
+
+
     public void fundAccount(Connection conn, String accountNo) throws SQLException {
         double fundAmount = 0;
         System.out.println("How much would you liked to fund your account by?");
@@ -160,6 +180,23 @@ public class Database {
         fundStatement.setDouble(1, fundAmount);
         fundStatement.setString(2,accountNo);
         fundStatement.executeUpdate();
+    }
+
+    public void addPayee(Connection conn, int custID) throws SQLException {
+        String payeeName;
+        int payeeAccNo;
+        int payeeID = this.getNewPayeeID(dbConnect()); //calling method which generates payeeID
+        System.out.println("Enter payee name.");
+        payeeName = scan.nextLine();
+        System.out.println("Enter payee account number.");
+        payeeAccNo = scan.nextInt();
+        PreparedStatement statement = conn.prepareStatement("INSERT INTO payee (payeeID,payeeName,payeeAccNo,custAccNo)"+
+                "VALUES (?,?,?,?)");
+       statement.setInt(1,payeeID);
+       statement.setString(2,payeeName);
+       statement.setInt(3,payeeAccNo);
+       statement.setInt(4,custID);
+       statement.executeUpdate();
     }
 
 }

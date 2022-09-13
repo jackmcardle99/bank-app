@@ -150,6 +150,20 @@ public class Bank {
 
     }
 
+    private void payeeForm() throws SQLException {
+        String userInput;
+        System.out.println("What would you like to do?" +
+                "(1)Add payee" +
+                "(2)Remove payee");
+        userInput = scan.nextLine();
+        if (userInput.equals("1")){
+            db.addPayee(db.dbConnect(), session.getCustID());
+        }
+        else{
+            //code in here for removing payee
+        }
+    }
+
     private String selectAccount(ArrayList<Account> accArray){
         String selectedAcc;
         System.out.println("Which account would you like to select?\nEnter the account number.");
@@ -189,8 +203,12 @@ private void home() throws InterruptedException, SQLException {
 
                 Enter what you would like to do.
                 (1)Fund an Account
-                (4)Open Account
-                (5)Exit""");
+                (2)Make a Payment
+                (3)View Payees
+                (4)View Transactions
+                (5)Open Account
+                (6)Close Account
+                (7)Exit""");
         //need to create sql query that searches for all accounts beloning to currently logged in customer - using
         // the session.getCustID variable - e.g. SELECT * FROM ACCOUNTS WHERE CUSTID = ....
         // Then add them into an ArrayList for manipulation of data
@@ -201,10 +219,14 @@ private void home() throws InterruptedException, SQLException {
                 //this method allows the user to select which account they want to modify
                 db.fundAccount(db.dbConnect(),this.selectAccount(accountList));
                 break;
-            case "4":
+            case "3":
+                this.payeeForm(); //need to create method to check if payee account number exists
+                break;
+                //call method here that makes payment
+            case "5":
                 this.openAccForm();
                 break;
-            case "5":
+            case "7":
                 System.out.println("Goodbye!");
                 break label;
         }
