@@ -154,13 +154,19 @@ public class Bank {
         String userInput;
         System.out.println("What would you like to do?" +
                 "(1)Add payee" +
-                "(2)Remove payee");
+                "(2)Remove payee" +
+                "(3)View payees");
         userInput = scan.nextLine();
         if (userInput.equals("1")){
             db.addPayee(db.dbConnect(), session.getCustID());
         }
-        else{
-            //code in here for removing payee
+        else if (userInput.equals("2")){
+           // String payeeList = this.viewPayees();
+        } else if (userInput.equals("3")) {
+            db.viewPayees(db.dbConnect(),session.getCustID());
+        }
+        else {
+            System.out.println("Please enter valid response.");
         }
     }
 

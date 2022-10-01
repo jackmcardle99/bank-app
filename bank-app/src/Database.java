@@ -199,4 +199,22 @@ public class Database {
        statement.executeUpdate();
     }
 
+    public String viewPayees(Connection conn, int custid) throws SQLException {
+        String payeeList = "";
+        PreparedStatement statement = conn.prepareStatement("SELECT payeeID, payeeName FROM payee, customers WHERE custID = ?");
+        statement.setInt(1,custid);
+        ResultSet rs = statement.executeQuery();
+
+        while (rs.next()){
+            payeeList = rs.getString("payeeID") + rs.getString("payeeName");
+        }
+        return payeeList;
+    }
+
+    public void removePayees(Connection conn) {
+
+        System.out.println("Please enter the ID of the payee you'd like to remove.");
+        System.out.println();
+    }
+
 }
