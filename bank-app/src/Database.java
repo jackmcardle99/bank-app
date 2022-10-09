@@ -200,21 +200,22 @@ public class Database {
     }
 
     public String viewPayees(Connection conn, int custid) throws SQLException {
-        String payeeList = "";
-        PreparedStatement statement = conn.prepareStatement("SELECT payeeID, payeeName FROM payee, customers WHERE custID = ?");
+       String payeeList = "";
+        PreparedStatement statement = conn.prepareStatement("SELECT payeeID, payeeName, payeeAccNo FROM payee, customers WHERE custID = ?");
         statement.setInt(1,custid);
         ResultSet rs = statement.executeQuery();
 
         while (rs.next()){
-            payeeList = rs.getString("payeeID") + rs.getString("payeeName");
+            payeeList += " PAYEE ID: " + rs.getString("payeeID") + " ---" +" PAYEE NAME: " +  rs.getString("payeeName") +
+                     " ---" + " ACCOUNT NUMBER: " + rs.getInt("payeeAccNo") + "\n";
         }
         return payeeList;
     }
 
-    public void removePayees(Connection conn) {
+    public void removePayees(Connection conn, int payeeID) {
+            //put code in here first to check that payeeID exists in table, if it doesnt then give msg back to user
+            //if payeeiD does exist then update table and remove payee
 
-        System.out.println("Please enter the ID of the payee you'd like to remove.");
-        System.out.println();
     }
 
 }

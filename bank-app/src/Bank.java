@@ -161,9 +161,14 @@ public class Bank {
             db.addPayee(db.dbConnect(), session.getCustID());
         }
         else if (userInput.equals("2")){
-           // String payeeList = this.viewPayees();
-        } else if (userInput.equals("3")) {
-            db.viewPayees(db.dbConnect(),session.getCustID());
+            System.out.println(db.viewPayees(db.dbConnect(),session.getCustID())); //printing out list of payees
+            int userInpt;
+            System.out.println("Please enter the ID of the payee you'd like to remove.");
+            userInpt = scan.nextInt();
+            db.removePayees(db.dbConnect(),userInpt);
+        }
+        else if (userInput.equals("3")) {
+            System.out.println(db.viewPayees(db.dbConnect(),session.getCustID())); //printing out list of payees
         }
         else {
             System.out.println("Please enter valid response.");
