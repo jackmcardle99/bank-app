@@ -165,10 +165,13 @@ public class Bank {
             int userInpt;
             System.out.println("Please enter the ID of the payee you'd like to remove.");
             userInpt = scan.nextInt();
-            db.removePayees(db.dbConnect(),userInpt);
+            System.out.println(db.payeeExists(db.dbConnect(), userInpt));
+            if(db.payeeExists(db.dbConnect(), userInpt) == true) db.removePayees(db.dbConnect(),userInpt);
+            else System.out.println("Payee ID not correct");
+
         }
         else if (userInput.equals("3")) {
-            System.out.println(db.viewPayees(db.dbConnect(),session.getCustID())); //printing out list of payees
+            System.out.println(db.viewPayees(db.dbConnect(),Integer.valueOf(db.findAccountNum(db.dbConnect(), session.getCustID())))); //printing out list of payees
         }
         else {
             System.out.println("Please enter valid response.");

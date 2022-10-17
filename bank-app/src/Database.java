@@ -171,7 +171,15 @@ public class Database {
         return false;
     }
 
-
+    public String findAccountNum(Connection conn, int custID) throws SQLException {
+        PreparedStatement statement = conn.prepareStatement("SELECT accountNo from accounts where custID = ?");
+        statement.setInt(1,custID);
+        ResultSet rs = statement.executeQuery();
+        while(rs.next()){
+            return rs.getString(1);
+        }
+        return null;
+    }
     public void fundAccount(Connection conn, String accountNo) throws SQLException {
         double fundAmount = 0;
         System.out.println("How much would you liked to fund your account by?");
@@ -201,7 +209,7 @@ public class Database {
 
     public String viewPayees(Connection conn, int custid) throws SQLException {
        String payeeList = "";
-        PreparedStatement statement = conn.prepareStatement("SELECT payeeID, payeeName, payeeAccNo FROM payee, customers WHERE custID = ?");
+        PreparedStatement statement = conn.prepareStatement("SELECT payeeID, payeeName, payeeAccNo FROM payee WHERE custAccNo = ?;");
         statement.setInt(1,custid);
         ResultSet rs = statement.executeQuery();
 
@@ -212,7 +220,22 @@ public class Database {
         return payeeList;
     }
 
-    public void removePayees(Connection conn, int payeeID) {
+    public boolean payeeExists(Connection conn, int payeeID) throws SQLException {
+        int resultPayeeID;
+        PreparedStatement statement = conn.prepareStatement("SELECT payeeID from payee where payeeID = ?");
+        statement.setInt(1,payeeID);
+        ResultSet rs = statement.executeQuery();
+        while(rs.next()){
+            resultPayeeID = rs.getInt("payeeID");
+            if(rs.getInt("payeeID") == payeeID) return true;
+        }
+        return false;
+    }
+
+    public void removePayees(Connection conn, int payeeID) throws SQLException {
+        PreparedStatement statement = conn.prepareStatement("DELETE FROM payee WHERE payeeID = ?;");
+        statement.setInt(1,payeeID);
+        statement.executeUpdate();
             //put code in here first to check that payeeID exists in table, if it doesnt then give msg back to user
             //if payeeiD does exist then update table and remove payee
 
