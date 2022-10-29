@@ -5,7 +5,7 @@ import java.util.Scanner;
 
 public class Database {
 
-    private Scanner scan = new Scanner(System.in);
+    private final Scanner scan = new Scanner(System.in);
     //method for connecting to mysql database
     public Connection dbConnect(){
         try{
@@ -17,9 +17,9 @@ public class Database {
         }
     }
 
-    public int getNewID(Connection conn) throws SQLException {
+    private int getNewID() throws SQLException {
         //This code below is getting the ID of the new customer, so we can add it to the credentials table
-        PreparedStatement getMaxID = conn.prepareStatement("SELECT  MAX(custID) FROM customers");
+        PreparedStatement getMaxID = dbConnect().prepareStatement("SELECT  MAX(custID) FROM customers");
         ResultSet rs = getMaxID.executeQuery();
         int id = 0;
         while(rs.next()){//set int as next ID num
@@ -28,10 +28,10 @@ public class Database {
         return id;
     }
 
-    public void createCustomerProfile(Connection conn, String[] answersArr, String strDob) throws SQLException {
+    public void createCustomerProfile(String[] answersArr, String strDob) throws SQLException {
         //Inserting new customer into customer table
-        int newID = this.getNewID(this.dbConnect());
-        PreparedStatement custStatement = conn.prepareStatement("INSERT INTO customers(custID,prefix, forename, surname, " +
+        int newID = getNewID();
+        PreparedStatement custStatement = dbConnect().prepareStatement("INSERT INTO customers(custID,prefix, forename, surname, " +
                 "gender, dob) VALUES (?,?,?,?,?,?);");
         custStatement.setInt(1,newID);
         custStatement.setString(2, (String) java.lang.reflect.Array.get(answersArr,0));
@@ -42,7 +42,7 @@ public class Database {
         custStatement.executeUpdate();
 
         //inserting customer details into credential tables
-        PreparedStatement credStatement = conn.prepareStatement("INSERT INTO credentials (username,password,custID)" +
+        PreparedStatement credStatement = dbConnect().prepareStatement("INSERT INTO credentials (username,password,custID)" +
                 "VALUES (?,?,?)");
         credStatement.setString(1,(String) java.lang.reflect.Array.get(answersArr,4));
         credStatement.setString(2,(String) Array.get(answersArr,5));
@@ -51,8 +51,8 @@ public class Database {
     }
 
     //this method is called when user tries to log in and enters username
-    public boolean findUserProfile(Connection conn,String user) throws SQLException {
-        PreparedStatement statement = conn.prepareStatement("SELECT username FROM credentials WHERE username = ?");
+    public boolean findUserProfile(String user) throws SQLException {
+        PreparedStatement statement = dbConnect().prepareStatement("SELECT username FROM credentials WHERE username = ?");
         statement.setString(1,user);
         ResultSet rs = statement.executeQuery(); //save results of statement to rs
         if (rs.next()) { //rs.next checks to see if results from query
@@ -65,9 +65,9 @@ public class Database {
     }
 
     //this method looks for user password when they try to log in
-    public boolean findPass(Connection conn, String pass,String user){
+    public boolean findPass(String pass,String user){
         try {
-            PreparedStatement statement = conn.prepareStatement("SELECT password FROM credentials WHERE password = ? AND username = ?");
+            PreparedStatement statement = dbConnect().prepareStatement("SELECT password FROM credentials WHERE password = ? AND username = ?");
             statement.setString(1,pass);
             statement.setString(2,user);
             ResultSet rs = statement.executeQuery();
@@ -84,8 +84,8 @@ public class Database {
     }
 
     // this method finds the custID once user successfully logs in, assigns it to current session
-    public int getUserSessionID(Connection conn, String user) throws SQLException {
-        PreparedStatement statement = conn.prepareStatement("SELECT custID FROM credentials WHERE username = ?");
+    public int getUserSessionID(String user) throws SQLException {
+        PreparedStatement statement = dbConnect().prepareStatement("SELECT custID FROM credentials WHERE username = ?");
         statement.setString(1,user);
         ResultSet rs = statement.executeQuery();
         if (rs.next()){
@@ -94,10 +94,10 @@ public class Database {
         return 0;
     }
 
-    // this method finds the profile of the customer who logged in
-    public Customer getCustomerProfile(Connection conn,int userID) throws SQLException {
+    // this method finds the profile of the customer who logged in - creating the session id
+    public Customer getCustomerProfile(int userID) throws SQLException {
         Customer currentSession = null;
-        PreparedStatement statement = conn.prepareStatement("SELECT * FROM customers WHERE custID = ?");
+        PreparedStatement statement = dbConnect().prepareStatement("SELECT * FROM customers WHERE custID = ?");
         statement.setInt(1,userID);
         ResultSet rs = statement.executeQuery();
         while (rs.next()){
@@ -108,9 +108,9 @@ public class Database {
         return currentSession;
     }
 
-    public int getNewAccID(Connection conn) throws SQLException {
+    private int getNewAccID() throws SQLException {
         //This code below is getting the ID of the new account, so we can add it to the accounts table
-        PreparedStatement getMaxID = conn.prepareStatement("SELECT  MAX(accountNo) FROM accounts");
+        PreparedStatement getMaxID = dbConnect().prepareStatement("SELECT  MAX(accountNo) FROM accounts");
         ResultSet rs = getMaxID.executeQuery();
         int accNO = 0;
         while(rs.next()){//set int as next ID num
@@ -120,19 +120,19 @@ public class Database {
         return accNO;
     }
 
-    public int getNewPayeeID(Connection conn) throws SQLException {
+    public int getNewPayeeID() throws SQLException {
         int payeeNo = 0;
-        PreparedStatement getMaxID = conn.prepareStatement("SELECT MAX(payeeID) FROM payee");
+        PreparedStatement getMaxID = dbConnect().prepareStatement("SELECT MAX(payeeID) FROM payee");
         ResultSet rs = getMaxID.executeQuery();
         while (rs.next()){
             payeeNo = rs.getInt(1) +1;
         }
         return payeeNo;
     }
-    public void createCustAccount(Connection conn, int cust, String type, int initBal) throws SQLException {
-        int newAccNo = this.getNewAccID(this.dbConnect());//getting new account number
+    public void createCustAccount(int cust, String type, int initBal) throws SQLException {
+        int newAccNo = getNewAccID();//getting new account number
         System.out.println(newAccNo);
-        PreparedStatement statement = conn.prepareStatement("INSERT INTO accounts (accountNo,balance,accountType," +
+        PreparedStatement statement = dbConnect().prepareStatement("INSERT INTO accounts (accountNo,balance,accountType," +
                 "custID)VALUES (?,?,?,?)");
         statement.setInt(1,newAccNo);
         statement.setLong(2,initBal);
@@ -141,10 +141,10 @@ public class Database {
         statement.executeUpdate();
     }
 
-    public ArrayList<Account> findUserAccounts(Connection conn, int custID) throws SQLException {
+    public ArrayList<Account> findUserAccounts(int custID) throws SQLException {
         //Account account = new Account();
         ArrayList<Account> accountList = new ArrayList<>();
-        PreparedStatement statement = conn.prepareStatement("SELECT * FROM accounts WHERE custID = ?");
+        PreparedStatement statement = dbConnect().prepareStatement("SELECT * FROM accounts WHERE custID = ?");
         statement.setInt(1,custID);
         ResultSet rs = statement.executeQuery();
         while (rs.next()){
@@ -162,83 +162,80 @@ public class Database {
         return accountList; //returning arraylist with the user's accounts
     }
 
-    public boolean findPayeeAccount(Connection conn, int payeeAcc) throws SQLException {
+    //this method is for validating payee's account exists
+    private boolean findPayeeAccount(int payeeAcc) throws SQLException {
         //code in here for finding payee account, if account found - return true, else false
-        PreparedStatement statement = conn.prepareStatement("SELECT * FROM accounts WHERE accountNo = ?");
+        PreparedStatement statement = dbConnect().prepareStatement("SELECT COUNT(1) FROM accounts WHERE accountNo = ?");
+        statement.setInt(1,payeeAcc);
         ResultSet rs = statement.executeQuery();
-
-
+        if(rs.next()){
+            //if account exists, = 1 (true), else = 0 (false)
+            return rs.getInt(1) == 1;
+        }
         return false;
     }
 
-    public String findAccountNum(Connection conn, int custID) throws SQLException {
-        PreparedStatement statement = conn.prepareStatement("SELECT accountNo from accounts where custID = ?");
+    public String findAccountNum(int custID) throws SQLException {
+        PreparedStatement statement = dbConnect().prepareStatement("SELECT accountNo from accounts where custID = ?");
         statement.setInt(1,custID);
         ResultSet rs = statement.executeQuery();
-        while(rs.next()){
+        if(rs.next()){
             return rs.getString(1);
         }
         return null;
     }
-    public void fundAccount(Connection conn, String accountNo) throws SQLException {
-        double fundAmount = 0;
+    public void fundAccount(String accountNo) throws SQLException {
+        double fundAmount;
         System.out.println("How much would you liked to fund your account by?");
         fundAmount = scan.nextDouble();
-        PreparedStatement fundStatement = conn.prepareStatement("UPDATE accounts SET balance = balance + ? WHERE accountNo = ?");
+        PreparedStatement fundStatement = dbConnect().prepareStatement("UPDATE accounts SET balance = balance + ? WHERE accountNo = ?");
         fundStatement.setDouble(1, fundAmount);
         fundStatement.setString(2,accountNo);
         fundStatement.executeUpdate();
     }
 
-    public void addPayee(Connection conn, int custID) throws SQLException {
-        String payeeName;
-        int payeeAccNo;
-        int payeeID = this.getNewPayeeID(dbConnect()); //calling method which generates payeeID
-        System.out.println("Enter payee name.");
-        payeeName = scan.nextLine();
-        System.out.println("Enter payee account number.");
-        payeeAccNo = scan.nextInt();
-        PreparedStatement statement = conn.prepareStatement("INSERT INTO payee (payeeID,payeeName,payeeAccNo,custAccNo)"+
-                "VALUES (?,?,?,?)");
-       statement.setInt(1,payeeID);
-       statement.setString(2,payeeName);
-       statement.setInt(3,payeeAccNo);
-       statement.setInt(4,custID);
-       statement.executeUpdate();
+    public void addPayee(String payeeName,int custID, int payeeAccNo) throws SQLException {
+        if(findPayeeAccount(payeeAccNo)){
+            PreparedStatement statement = dbConnect().prepareStatement("INSERT INTO payee (payeeID,payeeName,payeeAccNo,custAccNo)"+
+                    "VALUES (?,?,?,?)");
+            statement.setInt(1,getNewPayeeID());
+            statement.setString(2,payeeName);
+            statement.setInt(3,payeeAccNo);
+            statement.setInt(4,custID);
+            statement.executeUpdate();
+        }
+        else System.out.println("That account number doesn't exist.");
     }
 
-    public String viewPayees(Connection conn, int custid) throws SQLException {
-       String payeeList = "";
-        PreparedStatement statement = conn.prepareStatement("SELECT payeeID, payeeName, payeeAccNo FROM payee WHERE custAccNo = ?;");
-        statement.setInt(1,custid);
+    public String viewPayees(int custID) throws SQLException {
+       StringBuilder payeeList = new StringBuilder();
+        PreparedStatement statement = dbConnect().prepareStatement("SELECT payeeID, payeeName, payeeAccNo FROM payee WHERE custAccNo = ?;");
+        statement.setInt(1,custID);
         ResultSet rs = statement.executeQuery();
 
-        while (rs.next()){
-            payeeList += " PAYEE ID: " + rs.getString("payeeID") + " ---" +" PAYEE NAME: " +  rs.getString("payeeName") +
-                     " ---" + " ACCOUNT NUMBER: " + rs.getInt("payeeAccNo") + "\n";
+        while (rs.next()){ //using stringbuilder because if concenating a string in a loop, it creates a new object everytime
+                            // https://stackoverflow.com/questions/7817951/string-concatenation-in-java-when-to-use-stringbuilder-and-concat
+            payeeList.append(" PAYEE ID: ").append(rs.getString("payeeID")).append(" ---").append(" PAYEE NAME: ").append(rs.getString("payeeName")).append(" ---").append(" ACCOUNT NUMBER: ").append(rs.getInt("payeeAccNo")).append("\n");
         }
-        return payeeList;
+        return payeeList.toString();
     }
 
-    public boolean payeeExists(Connection conn, int payeeID) throws SQLException {
-        int resultPayeeID;
-        PreparedStatement statement = conn.prepareStatement("SELECT payeeID from payee where payeeID = ?");
+    public boolean payeeExists(int payeeID) throws SQLException {
+        PreparedStatement statement = dbConnect().prepareStatement("SELECT payeeID from payee where payeeID = ?");
         statement.setInt(1,payeeID);
         ResultSet rs = statement.executeQuery();
         while(rs.next()){
-            resultPayeeID = rs.getInt("payeeID");
             if(rs.getInt("payeeID") == payeeID) return true;
         }
         return false;
     }
-
-    public void removePayees(Connection conn, int payeeID) throws SQLException {
-        PreparedStatement statement = conn.prepareStatement("DELETE FROM payee WHERE payeeID = ?;");
-        statement.setInt(1,payeeID);
-        statement.executeUpdate();
-            //put code in here first to check that payeeID exists in table, if it doesnt then give msg back to user
-            //if payeeiD does exist then update table and remove payee
-
+    public void removePayees(int payeeID) throws SQLException {
+        if(payeeExists(payeeID)){
+            PreparedStatement statement = dbConnect().prepareStatement("DELETE FROM payee WHERE payeeID = ?;");
+            statement.setInt(1,payeeID);
+            statement.executeUpdate();
+        }
+        else System.out.println("Payee ID does not exist.");
     }
 
 }
