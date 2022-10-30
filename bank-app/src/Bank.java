@@ -8,7 +8,7 @@ import java.util.InputMismatchException;
 import java.util.Scanner;
 import java.sql.*;
 
-public class Bank {
+public class Bank{
     private final LocalDate currentDate = LocalDate.now(Clock.systemUTC());
 
     DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
@@ -17,8 +17,6 @@ public class Bank {
     private final Customer customer = new Customer(); //for calling customer class methods
     private Customer session; //assigned when logged in, this is for the currently logged in customer
     private final Database db = new Database();//instantiating Database class obj
-
-
 
     public static void main(String[] args) throws SQLException {
         Bank app = new Bank();
@@ -164,7 +162,7 @@ public class Bank {
                     if(!(userAmount > 0 )){
                         System.out.println("Please enter a valid amount.");
                     }
-                    else db.sendPayment(Integer.parseInt(userInput), session.getCustID());
+                    else db.sendPayment(Integer.parseInt(userInput), session.getCustID(), userAmount);
                     break;
 
                 }catch (InputMismatchException | NumberFormatException ex){
@@ -219,15 +217,12 @@ public class Bank {
     }
 private void home() throws InterruptedException, SQLException {
     String userInput;
-/// ARRAYLIST FOR STORING AND DISPLAYING CUSTOMER ACCOUNTS HERE
-    label:
     while (true){//this loop condition will change in the future, true for the purposes of seeing the home menu atm
         final LocalTime currentTime = LocalTime.now();
         String strTime = currentTime.format(timeFormatter);
         String strDate = currentDate.format(dateFormatter);
         ArrayList<Account> accountList = db.findUserAccounts(session.getCustID()); //adding accounts to the arraylist
 
-       // System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
         System.out.println("==================== Welcome to your Online Banking " + session.getPrefix() + " " +
                 "" + session.getSurname() +
                 " =========================\n" +
@@ -254,27 +249,17 @@ private void home() throws InterruptedException, SQLException {
         // after that's done, then proceed to allow customer to add balance etc..
         userInput = scan.nextLine();
         switch (userInput) {
-            case "1":
-                //this method allows the user to select which account they want to modify
-                db.fundAccount(this.selectAccount(accountList));
-                break;
-            case "2":
-                paymentForm();
-                break;
-            case "3":
-                this.payeeForm(); //need to create method to check if payee account number exists
-                break;
-                //call method here that makes payment
-            case "5":
-                this.openAccForm();
-                break;
-            case "7":
+            case "1" -> db.fundAccount(this.selectAccount(accountList));
+            case "2" -> paymentForm();
+            case "3" -> this.payeeForm(); //need to create method to check if payee account number exists
+            //case "4" -> break;
+            case "5" -> this.openAccForm();
+            case "7" -> {
                 System.out.println("Goodbye!");
-                break label;
+                System.exit(0);
+            }
+            default -> System.out.println("Please enter valid input.");
         }
-
-
-
     }
 }
 }

@@ -238,9 +238,17 @@ public class Database {
         else System.out.println("Payee ID does not exist.");
     }
 
-    public void sendPayment(int payeeID, int custID) throws SQLException {
+    public void sendPayment(int payeeID, int custID, double amount) throws SQLException {
+        PreparedStatement statement = dbConnect().prepareStatement("");
+        //have to check that the customer has the balance to make payment
+        //if cust has the money, have to check what type the customer owns, and apply a fee accordingly
+
+    }
+
+    private boolean isProfessional(){ //this method checks to see if cust acc is pro or standard
+        //create SQL query that checks account type, if PRO then return true, else false
         //PreparedStatement statement = dbConnect().prepareStatement("");
-        System.out.println("THIS IS WORKING IF THIS SHOWS");
+        return false;
     }
 
     private void updateCustomerBalance(){}
