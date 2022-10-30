@@ -213,7 +213,7 @@ public class Database {
         statement.setInt(1,custID);
         ResultSet rs = statement.executeQuery();
 
-        while (rs.next()){ //using stringbuilder because if concenating a string in a loop, it creates a new object everytime
+        while (rs.next()){ //using string-builder because if concatenating a string in a loop, it creates a new object everytime
                             // https://stackoverflow.com/questions/7817951/string-concatenation-in-java-when-to-use-stringbuilder-and-concat
             payeeList.append(" PAYEE ID: ").append(rs.getString("payeeID")).append(" ---").append(" PAYEE NAME: ").append(rs.getString("payeeName")).append(" ---").append(" ACCOUNT NUMBER: ").append(rs.getInt("payeeAccNo")).append("\n");
         }
@@ -238,4 +238,12 @@ public class Database {
         else System.out.println("Payee ID does not exist.");
     }
 
+    public void sendPayment(int payeeID, int custID) throws SQLException {
+        //PreparedStatement statement = dbConnect().prepareStatement("");
+        System.out.println("THIS IS WORKING IF THIS SHOWS");
+    }
+
+    private void updateCustomerBalance(){}
+
+    private void updatePayeeBalance(){}
 }

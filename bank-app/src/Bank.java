@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 import java.sql.*;
 
@@ -150,6 +151,30 @@ public class Bank {
 
     }
 
+    private void paymentForm() throws SQLException {
+        String userInput;
+        double userAmount;
+        while(true){
+            System.out.println(db.viewPayees(session.getCustID()));
+            System.out.println("Please choose a payee from the list above."); userInput = scan.nextLine();
+            if(db.payeeExists(Integer.parseInt(userInput))){
+                System.out.println("Please enter amount you wish to send. (0.00)");
+                try{
+                    userAmount = scan.nextDouble();
+                    if(!(userAmount > 0 )){
+                        System.out.println("Please enter a valid amount.");
+                    }
+                    else db.sendPayment(Integer.parseInt(userInput), session.getCustID());
+                    break;
+
+                }catch (InputMismatchException | NumberFormatException ex){
+                    System.out.println("Please enter a valid amount.");
+                }
+            }
+            else System.out.println("Payee doesn't exist.");
+        }
+    }
+
     private void payeeForm() throws SQLException {
         String userInput;
         System.out.println("What would you like to do?" +
@@ -181,13 +206,13 @@ public class Bank {
     private String selectAccount(ArrayList<Account> accArray){
         String selectedAcc;
         System.out.println("Which account would you like to select?\nEnter the account number.");
-        for (Account accs : accArray){ //listing the accounts the user has
-            System.out.println(accs.AcctoString());
+        for (Account acc : accArray){ //listing the accounts the user has
+            System.out.println(acc.AcctoString());
         }
         selectedAcc = scan.nextLine();
-        for (Account accs : accArray){ //listing the accounts the user has
-            if (selectedAcc.equals(accs.getAccountNo())){
-                return accs.getAccountNo(); //return account if user's input matches an account number on record
+        for (Account acc : accArray){ //listing the accounts the user has
+            if (selectedAcc.equals(acc.getAccountNo())){
+                return acc.getAccountNo(); //return account if user's input matches an account number on record
             }
         }
         return null;
@@ -232,6 +257,9 @@ private void home() throws InterruptedException, SQLException {
             case "1":
                 //this method allows the user to select which account they want to modify
                 db.fundAccount(this.selectAccount(accountList));
+                break;
+            case "2":
+                paymentForm();
                 break;
             case "3":
                 this.payeeForm(); //need to create method to check if payee account number exists
