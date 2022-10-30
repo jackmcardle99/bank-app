@@ -40,7 +40,7 @@ public class Bank {
                 String strDob;
                 try {
                     strDob = this.applyFormDOB();
-                    db.createCustomerProfile(db.dbConnect(),this.applyForm(),strDob);
+                    db.createCustomerProfile(applyForm(),strDob);
                 }catch (NumberFormatException | DateTimeException e){
                     System.out.println(e.getMessage() + ". Please enter a valid date.");
                 }
@@ -58,15 +58,15 @@ public class Bank {
         {
             System.out.println("Please enter in your username.");
             user = scan.nextLine();
-            userFound = db.findUserProfile(db.dbConnect(),user);
+            userFound = db.findUserProfile(user);
         }
             while (!passFound){
                 System.out.println("Please enter in the password for " + user);
                 String pass = scan.nextLine();
-                passFound = db.findPass(db.dbConnect(),pass,user);
+                passFound = db.findPass(pass,user);
             }
-        int userID = db.getUserSessionID(db.dbConnect(), user);
-        session = db.getCustomerProfile(db.dbConnect(),userID);
+        int userID = db.getUserSessionID(user);
+        session = db.getCustomerProfile(userID);
         try {
             this.home();
         } catch (InterruptedException e) {
@@ -146,7 +146,7 @@ public class Bank {
                 validated = acc.validateAccount(accChoice,initialBalance);
             }
         }while (!validated);
-        db.createCustAccount(db.dbConnect(), session.getCustID(),accChoice,initialBalance);
+        db.createCustAccount(session.getCustID(),accChoice,initialBalance);
 
     }
 
@@ -157,21 +157,24 @@ public class Bank {
                 "(2)Remove payee" +
                 "(3)View payees");
         userInput = scan.nextLine();
-        if (userInput.equals("1")){
-            db.addPayee(db.dbConnect(), session.getCustID());
-        }
-        else if (userInput.equals("2")){
-            System.out.println(db.viewPayees(db.dbConnect(),session.getCustID())); //printing out list of payees
-            int userInpt;
-            System.out.println("Please enter the ID of the payee you'd like to remove.");
-            userInpt = scan.nextInt();
-            db.removePayees(db.dbConnect(),userInpt);
-        }
-        else if (userInput.equals("3")) {
-            System.out.println(db.viewPayees(db.dbConnect(),session.getCustID())); //printing out list of payees
-        }
-        else {
-            System.out.println("Please enter valid response.");
+        switch (userInput) {
+            case "1" -> {
+                String payeeName; int payeeAccNo;
+                System.out.println("Enter payee name."); payeeName = scan.nextLine();
+                System.out.println("Enter payee account number."); payeeAccNo = scan.nextInt();
+                db.addPayee(payeeName,session.getCustID(),payeeAccNo);
+            }
+            case "2" -> {
+                System.out.println(db.viewPayees(session.getCustID())); //printing out list of payees
+                int userInpt;
+                System.out.println("Please enter the ID of the payee you'd like to remove."); userInpt = scan.nextInt();
+                System.out.println(db.payeeExists(userInpt));
+                if (db.payeeExists(userInpt)) db.removePayees(userInpt);
+                else System.out.println("Payee ID not correct");
+            }
+            case "3" ->
+                    System.out.println(db.viewPayees(Integer.parseInt(db.findAccountNum(session.getCustID())))); //printing out list of payees
+            default -> System.out.println("Please enter valid response.");
         }
     }
 
@@ -197,17 +200,17 @@ private void home() throws InterruptedException, SQLException {
         final LocalTime currentTime = LocalTime.now();
         String strTime = currentTime.format(timeFormatter);
         String strDate = currentDate.format(dateFormatter);
-        ArrayList<Account> accountList = db.findUserAccounts(db.dbConnect(), session.getCustID()); //adding accounts to the arraylist
+        ArrayList<Account> accountList = db.findUserAccounts(session.getCustID()); //adding accounts to the arraylist
 
-        System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+       // System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
         System.out.println("==================== Welcome to your Online Banking " + session.getPrefix() + " " +
                 "" + session.getSurname() +
                 " =========================\n" +
                 "Date: " + strDate + "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t Time: " + strTime);
         System.out.println("\n-- YOUR ACCOUNTS --");
-        for (Account lol : accountList)
+        for (Account acc : accountList)
         { //this for-loop is printing out to string all the customer's accounts in the home menu
-            System.out.println(lol.AcctoString());
+            System.out.println(acc.AcctoString());
         }
         System.out.println("----------------------------");
         System.out.println("""
@@ -228,7 +231,7 @@ private void home() throws InterruptedException, SQLException {
         switch (userInput) {
             case "1":
                 //this method allows the user to select which account they want to modify
-                db.fundAccount(db.dbConnect(),this.selectAccount(accountList));
+                db.fundAccount(this.selectAccount(accountList));
                 break;
             case "3":
                 this.payeeForm(); //need to create method to check if payee account number exists
