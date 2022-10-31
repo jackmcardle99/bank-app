@@ -1,7 +1,5 @@
 public class ProfessionalAccount extends Account{
 
-    private final double fee = 0.0125;
-
     public ProfessionalAccount(String accountNo, double balance, String accountType, int custID) {
         super(accountNo, balance, accountType, custID);
     }
@@ -10,6 +8,7 @@ public class ProfessionalAccount extends Account{
     }
 
     public double applyFee(double amount){
+        double fee = 0.0125;
         return (amount * fee) + amount;
     }
 }

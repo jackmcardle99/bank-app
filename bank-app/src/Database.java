@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Database {
+    ProfessionalAccount pro = new ProfessionalAccount();
+    Account stnd = new Account();
 
     private final Scanner scan = new Scanner(System.in);
     //method for connecting to mysql database
@@ -238,20 +240,37 @@ public class Database {
         else System.out.println("Payee ID does not exist.");
     }
 
-    public void sendPayment(int payeeID, int custID, double amount) throws SQLException {
-        PreparedStatement statement = dbConnect().prepareStatement("");
+    public void sendPayment(int payeeID, int accNo, double amount) throws SQLException {
+        //check customer account type first, calculate fee
         //have to check that the customer has the balance to make payment
-        //if cust has the money, have to check what type the customer owns, and apply a fee accordingly
+        //if cust has the money, update balances
+        if(!isProfessional()) System.out.println(pro.applyFee(amount));
 
     }
 
-    private boolean isProfessional(){ //this method checks to see if cust acc is pro or standard
-        //create SQL query that checks account type, if PRO then return true, else false
-        //PreparedStatement statement = dbConnect().prepareStatement("");
+    private boolean checkBalance(int custID, double amount) throws SQLException {
+        //method to check sender's balance
+        PreparedStatement statement = dbConnect().prepareStatement("SELECT balance FROM accounts WHERE custID = ?");
+        statement.setInt(1,custID);
+        ResultSet rs = statement.executeQuery();
+        while(rs.next()){
+            if(rs.getDouble("balance") >= amount) return true;
+        }
         return false;
     }
 
-    private void updateCustomerBalance(){}
+    private boolean isProfessional() throws SQLException { //this method checks to see if cust acc is pro or standard
+        //create SQL query that checks account type, if PRO then return true, else false
+        PreparedStatement statement = dbConnect().prepareStatement("");
+        return false;
+    }
 
-    private void updatePayeeBalance(){}
+    private void updateCustomerBalance(){
+        //sql update statement, update balance by subtracting amount sent + fee
+    }
+
+    private void updatePayeeBalance(){
+        //sql update statement, update balance by subtracting amount received, not including fee
+
+    }
 }

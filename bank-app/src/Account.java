@@ -36,6 +36,11 @@ public class Account {
         return accountOutput;
     }
 
+    public double applyFee(double amount){
+        double fee = 0.025;
+        return (amount * fee) + amount;
+    }
+
     public String AcctoString2(){ //RENAME THIS METHOD
         String accountOutput = "Account Number: " + this.accountNo;
         return accountOutput;
