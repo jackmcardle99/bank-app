@@ -6,8 +6,6 @@ import java.util.Scanner;
 public class Database {
     ProfessionalAccount pro = new ProfessionalAccount();
     Account stnd = new Account();
-
-    private final Scanner scan = new Scanner(System.in);
     //method for connecting to mysql database
     public Connection dbConnect(){
         try{
@@ -133,7 +131,6 @@ public class Database {
     }
     public void createCustAccount(int cust, String type, int initBal) throws SQLException {
         int newAccNo = getNewAccID();//getting new account number
-        System.out.println(newAccNo);
         PreparedStatement statement = dbConnect().prepareStatement("INSERT INTO accounts (accountNo,balance,accountType," +
                 "custID)VALUES (?,?,?,?)");
         statement.setInt(1,newAccNo);
@@ -187,6 +184,7 @@ public class Database {
         return null;
     }
     public void fundAccount(String accountNo) throws SQLException {
+        Scanner scan = new Scanner(System.in);
         double fundAmount;
         System.out.println("How much would you liked to fund your account by?");
         fundAmount = scan.nextDouble();
@@ -261,7 +259,7 @@ public class Database {
 
     private boolean isProfessional() throws SQLException { //this method checks to see if cust acc is pro or standard
         //create SQL query that checks account type, if PRO then return true, else false
-        PreparedStatement statement = dbConnect().prepareStatement("");
+       // PreparedStatement statement = dbConnect().prepareStatement("");
         return false;
     }
 

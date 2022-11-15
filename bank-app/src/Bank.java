@@ -18,6 +18,7 @@ public class Bank{
     private Customer session; //assigned when logged in, this is for the currently logged in customer
     private final Database db = new Database();//instantiating Database class obj
 
+
     public static void main(String[] args) throws SQLException {
         Bank app = new Bank();
         app.menu();
@@ -150,26 +151,24 @@ public class Bank{
     }
 
     private void paymentForm() throws SQLException {
-        String userInput;
-        double userAmount;
         while(true){
-            System.out.println(db.viewPayees(session.getCustID()));
-            System.out.println("Please choose a payee from the list above."); userInput = scan.nextLine();
-            if(db.payeeExists(Integer.parseInt(userInput))){
-                System.out.println("Please enter amount you wish to send. (0.00)");
-                try{
+            Scanner scan = new Scanner(System.in);
+            int userInput;
+            double userAmount;
+            System.out.println(db.viewPayees(session.getCustID())); //PROBLEM WITH THIS METHOD
+            System.out.println("Please choose a payee from the list above.");
+            try{
+                userInput = scan.nextInt();
+                if(!db.payeeExists(userInput)){
+                    System.out.println("That payee doesn't exist.");
+                }else {
+                    System.out.println("Please enter the amount you want to send. (Format 0.00)");
                     userAmount = scan.nextDouble();
-                    if(!(userAmount > 0 )){
-                        System.out.println("Please enter a valid amount.");
-                    }
-                    else db.sendPayment(Integer.parseInt(userInput), session.getCustID(), userAmount);
                     break;
-
-                }catch (InputMismatchException | NumberFormatException ex){
-                    System.out.println("Please enter a valid amount.");
                 }
+            }catch (InputMismatchException | NumberFormatException ex){
+               System.out.println("Please enter valid input.");
             }
-            else System.out.println("Payee doesn't exist.");
         }
     }
 
@@ -216,25 +215,23 @@ public class Bank{
         return null;
     }
 private void home() throws InterruptedException, SQLException {
+    boolean logOn = true;
     String userInput;
-    while (true){//this loop condition will change in the future, true for the purposes of seeing the home menu atm
+    while (logOn) {
+        Scanner scan = new Scanner(System.in);
         final LocalTime currentTime = LocalTime.now();
         String strTime = currentTime.format(timeFormatter);
         String strDate = currentDate.format(dateFormatter);
-        ArrayList<Account> accountList = db.findUserAccounts(session.getCustID()); //adding accounts to the arraylist
 
         System.out.println("==================== Welcome to your Online Banking " + session.getPrefix() + " " +
                 "" + session.getSurname() +
                 " =========================\n" +
                 "Date: " + strDate + "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t Time: " + strTime);
+        System.out.println("TODO: NUMBER FORMAT ERRORS WHEN ADDING FUNDS TO ACCOUNT, AND FUNDING NEWLY CREATED ACCOUNT - FIX!!!!");
         System.out.println("\n-- YOUR ACCOUNTS --");
-        for (Account acc : accountList)
-        { //this for-loop is printing out to string all the customer's accounts in the home menu
-            System.out.println(acc.AcctoString());
-        }
+        printAccounts();
         System.out.println("----------------------------");
         System.out.println("""
-
                 Enter what you would like to do.
                 (1)Fund an Account
                 (2)Make a Payment
@@ -243,23 +240,27 @@ private void home() throws InterruptedException, SQLException {
                 (5)Open Account
                 (6)Close Account
                 (7)Exit""");
-        //need to create sql query that searches for all accounts beloning to currently logged in customer - using
-        // the session.getCustID variable - e.g. SELECT * FROM ACCOUNTS WHERE CUSTID = ....
-        // Then add them into an ArrayList for manipulation of data
-        // after that's done, then proceed to allow customer to add balance etc..
         userInput = scan.nextLine();
         switch (userInput) {
-            case "1" -> db.fundAccount(this.selectAccount(accountList));
+            case "1" -> db.fundAccount(this.selectAccount(db.findUserAccounts(session.getCustID())));
             case "2" -> paymentForm();
             case "3" -> this.payeeForm(); //need to create method to check if payee account number exists
             //case "4" -> break;
             case "5" -> this.openAccForm();
             case "7" -> {
                 System.out.println("Goodbye!");
-                System.exit(0);
+                logOn = false;
             }
             default -> System.out.println("Please enter valid input.");
         }
     }
 }
+
+    private void printAccounts() throws SQLException {
+        ArrayList<Account> accountList = db.findUserAccounts(session.getCustID());
+        for (Account acc : accountList)
+        {
+            System.out.println(acc.AcctoString());
+        }
+    }
 }
