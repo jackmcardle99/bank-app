@@ -1,12 +1,12 @@
 import java.util.ArrayList;
 public class Account {
 
-    private String accountNo, accountType;
-    private int custID;
+    private String accountType;
+    private int custID, accountNo;
     private double balance;
     ArrayList<Account> accountList = new ArrayList<Account>(); //instantiating arraylist
 
-    public Account(String accountNo, double balance, String accountType, int custID){
+    public Account(int accountNo, double balance, String accountType, int custID){
         this.accountNo = accountNo;
         this.balance = balance;
         this.accountType = accountType;
@@ -42,8 +42,7 @@ public class Account {
     }
 
     public String AcctoString2(){ //RENAME THIS METHOD
-        String accountOutput = "Account Number: " + this.accountNo;
-        return accountOutput;
+        return "Account Number: " + this.accountNo;
     }
     public Account findCustAccount(){
         return null;
@@ -53,7 +52,7 @@ public class Account {
         return accountList;
     }
 
-    public String getAccountNo(){
+    public int getAccountNo(){
         return this.accountNo;
     }
 }

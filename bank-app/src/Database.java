@@ -149,12 +149,12 @@ public class Database {
         while (rs.next()){
             if (rs.getString("accountType").equals("pro")){ //if the account is a pro account, create pro account object
                 ProfessionalAccount proAccount;
-                proAccount = new ProfessionalAccount(rs.getString("accountNo"),rs.getDouble("balance"),rs.getString("accountType"),rs.getInt("custID"));
+                proAccount = new ProfessionalAccount(rs.getInt("accountNo"),rs.getDouble("balance"),rs.getString("accountType"),rs.getInt("custID"));
                 accountList.add(proAccount); //creating an instance of pro account class
             }
             else{
                 StandardAccount stnAccount;
-                stnAccount = new StandardAccount(rs.getString("accountNo"),rs.getDouble("balance"),rs.getString("accountType"),rs.getInt("custID"));
+                stnAccount = new StandardAccount(rs.getInt("accountNo"),rs.getDouble("balance"),rs.getString("accountType"),rs.getInt("custID"));
                 accountList.add(stnAccount); //creating and instance of standard account class
             }
         }
@@ -174,23 +174,23 @@ public class Database {
         return false;
     }
 
-    public String findAccountNum(int custID) throws SQLException {
+    public int findAccountNum(int custID) throws SQLException {
         PreparedStatement statement = dbConnect().prepareStatement("SELECT accountNo from accounts where custID = ?");
         statement.setInt(1,custID);
         ResultSet rs = statement.executeQuery();
         if(rs.next()){
-            return rs.getString(1);
+            return rs.getInt(1);
         }
-        return null;
+        return 0;
     }
-    public void fundAccount(String accountNo) throws SQLException {
+    public void fundAccount(int accountNo) throws SQLException {
         Scanner scan = new Scanner(System.in);
         double fundAmount;
         System.out.println("How much would you liked to fund your account by?");
         fundAmount = scan.nextDouble();
         PreparedStatement fundStatement = dbConnect().prepareStatement("UPDATE accounts SET balance = balance + ? WHERE accountNo = ?");
         fundStatement.setDouble(1, fundAmount);
-        fundStatement.setString(2,accountNo);
+        fundStatement.setInt(2,accountNo);
         fundStatement.executeUpdate();
     }
 
@@ -238,18 +238,21 @@ public class Database {
         else System.out.println("Payee ID does not exist.");
     }
 
-    public void sendPayment(int payeeID, int accNo, double amount) throws SQLException {
+    public void makePayment(int payeeID, int accNo, double amount) throws SQLException {
         //check customer account type first, calculate fee
         //have to check that the customer has the balance to make payment
         //if cust has the money, update balances
-        if(!isProfessional()) System.out.println(pro.applyFee(amount));
-
+        if(checkBalance(accNo,amount)){
+            if(!isProfessional()) amount = stnd.applyFee(amount);
+            else amount = pro.applyFee(amount); //apply fees for type of accounts
+            System.out.println(amount);
+        }else System.out.println("Balance insufficient.");
     }
 
-    private boolean checkBalance(int custID, double amount) throws SQLException {
+    private boolean checkBalance(int accNo, double amount) throws SQLException {
         //method to check sender's balance
-        PreparedStatement statement = dbConnect().prepareStatement("SELECT balance FROM accounts WHERE custID = ?");
-        statement.setInt(1,custID);
+        PreparedStatement statement = dbConnect().prepareStatement("SELECT balance FROM accounts WHERE accountNo = ?");
+        statement.setInt(1,accNo);
         ResultSet rs = statement.executeQuery();
         while(rs.next()){
             if(rs.getDouble("balance") >= amount) return true;
@@ -269,6 +272,10 @@ public class Database {
 
     private void updatePayeeBalance(){
         //sql update statement, update balance by subtracting amount received, not including fee
+        /*
+        SELECT PAYEEACCNO WHERE PAYEEID = ?
+        UPDATE BALANCE = ? WHERE ACCNO = PAYEEACCNO
+         */
 
     }
 }

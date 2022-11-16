@@ -1,7 +1,7 @@
 public class StandardAccount extends Account{
 
     private final double fee = 0.025;
-    public StandardAccount(String accountNo, double balance, String accountType, int custID) {
+    public StandardAccount(int accountNo, double balance, String accountType, int custID) {
         super(accountNo, balance, accountType, custID);
     }
 

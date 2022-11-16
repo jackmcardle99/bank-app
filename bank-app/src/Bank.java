@@ -164,6 +164,8 @@ public class Bank{
                 }else {
                     System.out.println("Please enter the amount you want to send. (Format 0.00)");
                     userAmount = scan.nextDouble();
+                    int paymentAccount = selectAccount(db.findUserAccounts(session.getCustID()));
+                    db.makePayment(session.getCustID(), paymentAccount, userAmount);
                     break;
                 }
             }catch (InputMismatchException | NumberFormatException ex){
@@ -195,24 +197,24 @@ public class Bank{
                 else System.out.println("Payee ID not correct");
             }
             case "3" ->
-                    System.out.println(db.viewPayees(Integer.parseInt(db.findAccountNum(session.getCustID())))); //printing out list of payees
+                    System.out.println(db.viewPayees(db.findAccountNum(session.getCustID()))); //printing out list of payees
             default -> System.out.println("Please enter valid response.");
         }
     }
 
-    private String selectAccount(ArrayList<Account> accArray){
-        String selectedAcc;
+    private int selectAccount(ArrayList<Account> accArray){
+        int selectedAcc;
         System.out.println("Which account would you like to select?\nEnter the account number.");
         for (Account acc : accArray){ //listing the accounts the user has
             System.out.println(acc.AcctoString());
         }
-        selectedAcc = scan.nextLine();
+        selectedAcc = scan.nextInt();
         for (Account acc : accArray){ //listing the accounts the user has
-            if (selectedAcc.equals(acc.getAccountNo())){
+            if (selectedAcc == acc.getAccountNo()){
                 return acc.getAccountNo(); //return account if user's input matches an account number on record
             }
         }
-        return null;
+        return 0;
     }
 private void home() throws InterruptedException, SQLException {
     boolean logOn = true;
@@ -242,7 +244,7 @@ private void home() throws InterruptedException, SQLException {
                 (7)Exit""");
         userInput = scan.nextLine();
         switch (userInput) {
-            case "1" -> db.fundAccount(this.selectAccount(db.findUserAccounts(session.getCustID())));
+            case "1" -> db.fundAccount(selectAccount(db.findUserAccounts(session.getCustID())));
             case "2" -> paymentForm();
             case "3" -> this.payeeForm(); //need to create method to check if payee account number exists
             //case "4" -> break;
