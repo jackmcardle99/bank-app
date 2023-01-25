@@ -243,9 +243,11 @@ public class Database {
         //have to check that the customer has the balance to make payment
         //if cust has the money, update balances
         if(checkBalance(accNo,amount)){
-            if(!isProfessional()) amount = stnd.applyFee(amount);
+            if(!isProfessional(accNo)) amount = stnd.applyFee(amount);
             else amount = pro.applyFee(amount); //apply fees for type of accounts
-            System.out.println(amount);
+            updateCustomerBalance(accNo, amount, payeeID);
+            updatePayeeBalance();
+            System.out.format("%.2f", amount);
         }else System.out.println("Balance insufficient.");
     }
 
@@ -260,14 +262,26 @@ public class Database {
         return false;
     }
 
-    private boolean isProfessional() throws SQLException { //this method checks to see if cust acc is pro or standard
-        //create SQL query that checks account type, if PRO then return true, else false
-       // PreparedStatement statement = dbConnect().prepareStatement("");
+    private boolean isProfessional(int accNo) throws SQLException { //this method checks to see if cust acc is pro or standard
+        PreparedStatement statement = dbConnect().prepareStatement("SELECT accountType from accounts WHERE accountNo = ?");
+        statement.setInt(1,accNo);
+        ResultSet rs = statement.executeQuery();
+        while(rs.next()){
+            if(rs.getString(1).equals("pro")) return true;
+        }
         return false;
     }
 
-    private void updateCustomerBalance(){
-        //sql update statement, update balance by subtracting amount sent + fee
+    private void updateCustomerBalance(int accNo, double amount, int payeeID) throws SQLException {
+        PreparedStatement custUpdate = dbConnect().prepareStatement("UPDATE accounts SET balance = balance - ? WHERE accountNo = ?");
+        PreparedStatement payeeUpdate = dbConnect().prepareStatement("UPDATE accounts SET balance = balance + ? WHERE accountNo = ?");
+        custUpdate.setDouble(1,amount);
+        custUpdate.setInt(2, accNo);
+        payeeUpdate.setDouble(1,amount);
+        payeeUpdate.setInt(2,payeeID);
+        custUpdate.executeUpdate();
+        payeeUpdate.executeUpdate();
+                //sql update statement, update balance by subtracting amount sent + fee
     }
 
     private void updatePayeeBalance(){
