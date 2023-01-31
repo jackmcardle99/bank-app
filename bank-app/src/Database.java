@@ -258,6 +258,7 @@ public class Database {
         ResultSet rs = statement.executeQuery();
         while(rs.next()){
             if(rs.getDouble("balance") >= amount) return true;
+            //dsdfnslkdf
         }
         return false;
     }
@@ -274,6 +275,7 @@ public class Database {
 
     private void updateCustomerBalance(int accNo, double amount, int payeeID) throws SQLException {
         PreparedStatement custUpdate = dbConnect().prepareStatement("UPDATE accounts SET balance = balance - ? WHERE accountNo = ?");
+        // MUST UPDATE THE STATEMENT BELOW SO THAT PAYEEID IS LINKED TO ACCOUNT NO
         PreparedStatement payeeUpdate = dbConnect().prepareStatement("UPDATE accounts SET balance = balance + ? WHERE accountNo = ?");
         custUpdate.setDouble(1,amount);
         custUpdate.setInt(2, accNo);
