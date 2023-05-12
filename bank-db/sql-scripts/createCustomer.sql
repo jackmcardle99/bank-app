@@ -4,7 +4,7 @@ CREATE TABLE customers (
        forename varchar(15),
        surname varchar(15),
        gender char(6),
-       dob date,
+       dob char(10),
 
        constraint  PK_customers primary key (custID)
 );

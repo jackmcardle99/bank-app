@@ -2,6 +2,7 @@ import java.lang.reflect.Array;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.security.*;
 
 public class Database {
     ProfessionalAccount pro = new ProfessionalAccount();
@@ -10,7 +11,7 @@ public class Database {
     public Connection dbConnect(){
         try{
             Class.forName("com.mysql.cj.jdbc.Driver");
-            return DriverManager.getConnection("jdbc:mysql://localhost:3306/bank_db","root","76647664");
+            return DriverManager.getConnection("jdbc:mysql://localhost:3306/bank_db","root","7664");
         }
         catch (SQLException | ClassNotFoundException e){
             throw new RuntimeException("Can't connect to database.",e);
