@@ -163,7 +163,7 @@ public class Database {
     }
 
     //this method is for validating payee's account exists
-    private boolean findPayeeAccount(int payeeAcc) throws SQLException {
+    private boolean payeeAccountFound(int payeeAcc) throws SQLException {
         //code in here for finding payee account, if account found - return true, else false
         PreparedStatement statement = dbConnect().prepareStatement("SELECT COUNT(1) FROM accounts WHERE accountNo = ?");
         statement.setInt(1,payeeAcc);
@@ -196,7 +196,7 @@ public class Database {
     }
 
     public void addPayee(String payeeName,int custID, int payeeAccNo) throws SQLException {
-        if(findPayeeAccount(payeeAccNo)){
+        if(payeeAccountFound(payeeAccNo)){
             PreparedStatement statement = dbConnect().prepareStatement("INSERT INTO payee (payeeID,payeeName,payeeAccNo,custAccNo)"+
                     "VALUES (?,?,?,?)");
             statement.setInt(1,getNewPayeeID());
@@ -247,7 +247,7 @@ public class Database {
             if(!isProfessional(accNo)) amount = stnd.applyFee(amount);
             else amount = pro.applyFee(amount); //apply fees for type of accounts
             updateCustomerBalance(accNo, amount, payeeID);
-            updatePayeeBalance();
+            //updatePayeeBalance();
             System.out.format("%.2f", amount);
         }else System.out.println("Balance insufficient.");
     }
@@ -274,17 +274,78 @@ public class Database {
         return false;
     }
 
+    private int findPayeeAccountNo(int payeeID){
+        Connection connection = null;
+        PreparedStatement statement = null;
+        int payeeAccNo = 0;
+        try{
+            connection = dbConnect();
+            connection.setAutoCommit(false);
+
+            statement = connection.prepareStatement("SELECT payeeAccNo FROM payee WHERE payeeID = ?");
+            statement.setInt(1, payeeID);
+            ResultSet rs = statement.executeQuery();
+            if (rs.next()) {
+            payeeAccNo  =   rs.getInt("payeeAccNo");
+            }
+
+        } catch (SQLException e) {
+            try {
+                System.err.print("Transaction failed. Rolling back.");
+                connection.rollback();
+            } catch (SQLException excep) {
+                excep.printStackTrace();
+            }
+        }
+        return payeeAccNo;
+    }
+
     private void updateCustomerBalance(int accNo, double amount, int payeeID) throws SQLException {
-        PreparedStatement custUpdate = dbConnect().prepareStatement("UPDATE accounts SET balance = balance - ? WHERE accountNo = ?");
-        // MUST UPDATE THE STATEMENT BELOW SO THAT PAYEEID IS LINKED TO ACCOUNT NO
-        PreparedStatement payeeUpdate = dbConnect().prepareStatement("UPDATE accounts SET balance = balance + ? WHERE accountNo = ?");
-        custUpdate.setDouble(1,amount);
-        custUpdate.setInt(2, accNo);
-        payeeUpdate.setDouble(1,amount);
-        payeeUpdate.setInt(2,payeeID);
-        custUpdate.executeUpdate();
-        payeeUpdate.executeUpdate();
-                //sql update statement, update balance by subtracting amount sent + fee
+        Connection connection = null;
+        PreparedStatement custUpdate = null;
+        PreparedStatement payeeUpdate = null;
+
+        try{
+            connection = dbConnect();
+
+            // begin transaction
+            connection.setAutoCommit(false); // ACID acronym, atomicity, either all transactions work or none do
+
+
+            custUpdate = connection.prepareStatement("UPDATE accounts SET balance = balance - ? WHERE accountNo = ?");
+            custUpdate.setDouble(1,amount);
+            custUpdate.setInt(2, accNo);
+
+            // the payee shouldn't receive the balance + fee, only the balance.
+            int payeeAccNo = findPayeeAccountNo(payeeID);
+            System.out.println("THIS IS THE PAYEE ACCOUNT NUMBER " + payeeAccNo );
+            payeeUpdate = connection.prepareStatement("UPDATE accounts SET balance = balance + ? WHERE accountNo = ?");
+            payeeUpdate.setDouble(1,amount);
+            payeeUpdate.setInt(2,payeeAccNo);
+            // MUST UPDATE THE STATEMENT BELOW SO THAT PAYEEID IS LINKED TO ACCOUNT NO
+
+            custUpdate.executeUpdate();
+            payeeUpdate.executeUpdate();
+
+            connection.commit(); // commit transaction
+        }catch (SQLException e){
+            try {
+                System.err.print("Transaction failed. Rolling back.");
+                connection.rollback();
+            } catch (SQLException excep) {
+                excep.printStackTrace();
+            }
+        } finally {
+            if (custUpdate != null) {
+                try { custUpdate.close(); } catch (SQLException e) { /* ignored */ }
+            }
+            if (payeeUpdate != null) {
+                try { payeeUpdate.close(); } catch (SQLException e) { /* ignored */ }
+            }
+            if (connection != null) {
+                try { connection.close(); } catch (SQLException e) { /* ignored */ }
+            }
+        }
     }
 
     private void updatePayeeBalance(){

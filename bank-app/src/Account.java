@@ -36,15 +36,16 @@ public class Account {
         return accountOutput;
     }
 
-    public double applyFee(double amount){
+    public double applyFee(double amount){ //applies payment fee and returns amount with fee
         double fee = 0.025;
+        System.out.println((amount * fee) + amount);
         return (amount * fee) + amount;
     }
 
     public String AcctoString2(){ //RENAME THIS METHOD
         return "Account Number: " + this.accountNo;
     }
-    public Account findCustAccount(){
+    public Account findCust3Account(){
         return null;
     }
 
