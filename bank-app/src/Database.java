@@ -239,16 +239,15 @@ public class Database {
         else System.out.println("Payee ID does not exist.");
     }
 
-    public void makePayment(int payeeID, int accNo, double amount) throws SQLException {
+    public void makePayment(int payeeID, int accNo, double amount, int custID) throws SQLException {
         //check customer account type first, calculate fee
         //have to check that the customer has the balance to make payment
         //if cust has the money, update balances
         if(checkBalance(accNo,amount)){
             if(!isProfessional(accNo)) amount = stnd.applyFee(amount);
             else amount = pro.applyFee(amount); //apply fees for type of accounts
-            updateCustomerBalance(accNo, amount, payeeID);
-            //updatePayeeBalance();
-            System.out.format("%.2f", amount);
+            updateCustomerBalance(accNo, amount, payeeID, custID);
+            createTransaction(amount, custID, payeeID);
         }else System.out.println("Balance insufficient.");
     }
 
@@ -300,7 +299,7 @@ public class Database {
         return payeeAccNo;
     }
 
-    private void updateCustomerBalance(int accNo, double amount, int payeeID) throws SQLException {
+    private void updateCustomerBalance(int accNo, double amount, int payeeID, int custID) throws SQLException {
         Connection connection = null;
         PreparedStatement custUpdate = null;
         PreparedStatement payeeUpdate = null;
@@ -318,7 +317,6 @@ public class Database {
 
             // the payee shouldn't receive the balance + fee, only the balance.
             int payeeAccNo = findPayeeAccountNo(payeeID);
-            System.out.println("THIS IS THE PAYEE ACCOUNT NUMBER " + payeeAccNo );
             payeeUpdate = connection.prepareStatement("UPDATE accounts SET balance = balance + ? WHERE accountNo = ?");
             payeeUpdate.setDouble(1,amount);
             payeeUpdate.setInt(2,payeeAccNo);
@@ -348,12 +346,41 @@ public class Database {
         }
     }
 
-    private void updatePayeeBalance(){
-        //sql update statement, update balance by subtracting amount received, not including fee
-        /*
-        SELECT PAYEEACCNO WHERE PAYEEID = ?
-        UPDATE BALANCE = ? WHERE ACCNO = PAYEEACCNO
-         */
+    public void createTransaction(double amount, int custID, int payeeID){
+        Connection connection = null;
+        PreparedStatement createCustTnx = null;
+        PreparedStatement createPayeeTnx = null;
 
+        try{
+            connection = dbConnect();
+            connection.setAutoCommit(false);
+
+            createCustTnx = connection.prepareStatement("INSERT INTO transactions (tnxID, amount, tnxType, custAccId, payeeID) VALUES (?,?,?,?,?)");
+            createCustTnx.setInt(1,1);
+            createCustTnx.setDouble(2,amount);
+            createCustTnx.setString(3,"sent");
+            createCustTnx.setInt(4, custID);
+            createCustTnx.setInt(5, payeeID);
+            createCustTnx.executeUpdate();
+            connection.commit();
+
+        } catch (SQLException e) {
+            try {
+                System.err.print("Transaction failed. Rolling back.");
+                connection.rollback();
+            } catch (SQLException excep) {
+                excep.printStackTrace();
+            }
+        }finally {
+            if (createCustTnx != null) {
+                try { createCustTnx.close(); } catch (SQLException e) { /* ignored */ }
+            }
+//            if (payeeUpdate != null) {
+//                try { payeeUpdate.close(); } catch (SQLException e) { /* ignored */ }
+//            }
+            if (connection != null) {
+                try { connection.close(); } catch (SQLException e) { /* ignored */ }
+            }
+        }
     }
 }

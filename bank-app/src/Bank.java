@@ -165,7 +165,7 @@ public class Bank{
                     System.out.println("Please enter the amount you want to send. (Format 0.00)");
                     userAmount = scan.nextDouble();
                     int paymentAccount = selectAccount(db.findUserAccounts(session.getCustID()));
-                    db.makePayment(session.getCustID(), paymentAccount, userAmount);
+                    db.makePayment(userInput, paymentAccount, userAmount, session.getCustID());
                     break;
                 }
             }catch (InputMismatchException | NumberFormatException ex){
